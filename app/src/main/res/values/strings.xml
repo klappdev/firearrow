@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">firearrow</string>
+
+    <string name="category_title">Show categories</string>
+    <string name="feature_title">Show features</string>
+    <string name="console_title">Console output</string>
+    <string name="empty_features">List features are empty</string>
+
+    <string name="start_console_text">Start executing Java/C++ feature operations</string>
+</resources>

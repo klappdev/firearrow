@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    app:startDestination="@id/category_fragment"
+    android:id="@+id/navigation_firearrow">
+
+    <fragment
+        android:id="@+id/category_fragment"
+        android:name="org.kl.firearrow.ui.category.CategoryFragment"
+        tools:layout="@layout/fragment_category">
+
+        <action
+            android:id="@+id/action_category_fragment_to_feature_activity"
+            app:destination="@id/feature_activity"/>
+    </fragment>
+
+    <activity
+        android:id="@+id/feature_activity"
+        android:name="org.kl.firearrow.ui.feature.FeatureActivity"
+        android:label="@string/feature_title"
+        tools:layout="@layout/activity_feature">
+
+        <argument
+            android:name="categoryId"
+            app:argType="long"
+            android:defaultValue="0L"/>
+    </activity>
+</navigation>

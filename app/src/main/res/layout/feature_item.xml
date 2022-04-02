@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="feature"
+            type="org.kl.firearrow.model.Feature" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="1dp"
+        android:layout_marginBottom="1dp"
+        android:orientation="horizontal"
+
+        android:paddingTop="2dp"
+        android:paddingBottom="2dp"
+        android:paddingLeft="2dp"
+        android:paddingRight="2dp"
+        android:minHeight="64dp"
+
+        android:background="@color/white"
+        android:foreground="?android:attr/selectableItemBackground">
+
+        <ImageView
+            android:id="@+id/feature_image"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:paddingLeft="4dp"
+            android:paddingTop="10dp"
+            android:paddingRight="4dp"
+            android:src="@drawable/feature_icon" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="25dp"
+            android:paddingEnd="4dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/name_feature_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                app:fontFamily="Roboto Regular"
+                android:textColor="@color/gray"
+
+                android:textSize="14sp"
+                android:text="@{feature.name}">
+            </TextView>
+
+            <TextView
+                android:id="@+id/date_feature_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:layout_marginTop="20dp"
+                android:gravity="center_vertical"
+                app:fontFamily="Roboto Regular"
+                android:textColor="@color/gray"
+
+                android:textSize="12sp"
+                android:text="@{feature.date}">
+            </TextView>
+        </LinearLayout>
+
+    </LinearLayout>
+</layout>
