@@ -35,7 +35,7 @@ namespace kl::log {
         va_end(arguments);
     }
 
-    void info(const char* tag, std::string& message) {
+    void info(const char* tag, const std::string& message) {
         __android_log_write(ANDROID_LOG_INFO, tag, message.c_str());
     }
 
@@ -46,7 +46,7 @@ namespace kl::log {
         va_end(arguments);
     }
 
-    void debug(const char* tag, std::string& message) {
+    void debug(const char* tag, const std::string& message) {
         __android_log_write(ANDROID_LOG_DEBUG, tag, message.c_str());
     }
 
@@ -57,7 +57,7 @@ namespace kl::log {
         va_end(arguments);
     }
 
-    void error(const char* tag, std::string& message) {
+    void error(const char* tag, const std::string& message) {
         __android_log_write(ANDROID_LOG_DEBUG, tag, message.c_str());
     }
 }

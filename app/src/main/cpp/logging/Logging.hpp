@@ -29,13 +29,13 @@ namespace kl::log {
 
     [[gnu::format(printf, 2, 3)]]
     void info(const char* tag, const char* format, ...);
-    void info(const char* tag, std::string& message);
+    void info(const char* tag, const std::string& message);
 
     [[gnu::format(printf, 2, 3)]]
     void debug(const char* tag, const char* format, ...);
-    void debug(const char* tag, std::string& message);
+    void debug(const char* tag, const std::string& message);
 
     [[gnu::format(printf, 2, 3)]]
     void error(const char* tag, const char* format, ...);
-    void error(const char* tag, std::string& message);
+    void error(const char* tag, const std::string& message);
 }

@@ -10,7 +10,12 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
 import dagger.hilt.android.AndroidEntryPoint;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
+
 import lombok.Getter;
+import javax.inject.Inject;
 
 import org.kl.firearrow.R;
 import org.kl.firearrow.databinding.FragmentCategoryBinding;
@@ -21,11 +26,15 @@ import org.kl.firearrow.viewmodel.CategoryListViewModel;
 @AndroidEntryPoint
 public final class CategoryFragment extends Fragment {
     private RecyclerView categoryRecyclerView;
+
     @Getter
     private MainActivity parentActivity;
     @Getter
     private CategoryAdapter categoryAdapter;
     private CategoryListViewModel categoriesViewModel;
+
+    @Inject
+    public CompositeDisposable disposable;
 
     private NavigateCategoryListener navigateCategoryListener;
     private FragmentCategoryBinding binding;
@@ -49,6 +58,7 @@ public final class CategoryFragment extends Fragment {
     @Override
     public void onDestroyView() {
         this.binding = null;
+        disposable.dispose();
         super.onDestroyView();
     }
 
@@ -64,8 +74,11 @@ public final class CategoryFragment extends Fragment {
     }
 
     private void subscribeUi() {
-        categoriesViewModel.getCategories().observe(getViewLifecycleOwner(), list -> {
-            categoryAdapter.submitList(list);
-        });
+        disposable.add(categoriesViewModel.getCategories()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(data -> {
+                categoryAdapter.submitList(data);
+            }));
     }
 }

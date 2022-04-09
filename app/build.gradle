@@ -3,6 +3,7 @@ plugins {
 
     id 'dagger.hilt.android.plugin'
     id 'androidx.navigation.safeargs'
+    id 'com.google.protobuf'
 }
 
 android {
@@ -49,51 +50,90 @@ android {
     }
 }
 
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:$rootProject.protocVersion"
+    }
+
+    generateProtoTasks {
+        all().each { task ->
+            task.builtins {
+                java {
+                    option 'lite'
+                }
+            }
+        }
+    }
+}
+
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    compileOnly "org.projectlombok:lombok:$rootProject.lombokVersion"
-    annotationProcessor "org.projectlombok:lombok:$rootProject.lombokVersion"
-    annotationProcessor "androidx.room:room-compiler:$rootProject.roomVersion"
-    annotationProcessor "com.github.bumptech.glide:compiler:$rootProject.glideVersion"
-    annotationProcessor "com.google.dagger:hilt-android-compiler:$rootProject.hiltVersion"
-
     implementation "androidx.startup:startup-runtime:$rootProject.appStartupVersion"
-    implementation "androidx.preference:preference:$rootProject.preferenceVersion"
     implementation "androidx.appcompat:appcompat:$rootProject.appCompatVersion"
 
+    // Ui
     implementation "com.google.android.material:material:$rootProject.materialVersion"
     implementation "androidx.constraintlayout:constraintlayout:$rootProject.constraintLayoutVersion"
+    implementation "androidx.preference:preference:$rootProject.preferenceVersion"
     implementation "androidx.recyclerview:recyclerview:$rootProject.recyclerViewVersion"
 
+    // Protobuf
+    implementation "com.google.protobuf:protobuf-javalite:$rootProject.protobufLiteVersion"
+    implementation "com.jakewharton.timber:timber:$timberVersion"
+
+    // Lombok
+    compileOnly "org.projectlombok:lombok:$rootProject.lombokVersion"
+    annotationProcessor "org.projectlombok:lombok:$rootProject.lombokVersion"
+
+    // Lifecycle
     implementation "androidx.lifecycle:lifecycle-livedata:$rootProject.lifecycleVersion"
     implementation "androidx.lifecycle:lifecycle-viewmodel:$rootProject.lifecycleVersion"
     implementation "androidx.lifecycle:lifecycle-extensions:$rootProject.lifecycleVersion"
 
+    // Glide
+    annotationProcessor "com.github.bumptech.glide:compiler:$rootProject.glideVersion"
+    implementation "com.github.bumptech.glide:glide:$rootProject.glideVersion"
+
+    // Hilt
+    annotationProcessor "com.google.dagger:hilt-android-compiler:$rootProject.hiltVersion"
+    implementation "com.google.dagger:hilt-android:$rootProject.hiltVersion"
+    androidTestAnnotationProcessor "com.google.dagger:hilt-android-compiler:$rootProject.hiltVersion"
+    androidTestImplementation "com.google.dagger:hilt-android-testing:$rootProject.hiltVersion"
+
+    // Navigation
     implementation "androidx.navigation:navigation-fragment:$rootProject.navigationVersion"
     implementation "androidx.navigation:navigation-ui:$rootProject.navigationVersion"
-    implementation "androidx.paging:paging-runtime-ktx:$rootProject.pagingVersion"
+
+    // Paging 3
+    implementation "androidx.paging:paging-runtime:$rootProject.pagingVersion"
     implementation "androidx.paging:paging-rxjava3:$rootProject.pagingVersion"
 
+    // RxJava 3
     implementation "io.reactivex.rxjava3:rxjava:$rootProject.rxJavaVersion"
     implementation "io.reactivex.rxjava3:rxandroid:$rootProject.rxAndroidVersion"
 
+    // Worker
+    implementation "androidx.work:work-runtime:$rootProject.workVersion"
+    implementation "androidx.work:work-rxjava3:$rootProject.workVersion"
+    androidTestImplementation "androidx.work:work-testing:$rootProject.workVersion"
+
+    // Room
+    annotationProcessor "androidx.room:room-compiler:$rootProject.roomVersion"
     implementation "androidx.room:room-runtime:$rootProject.roomVersion"
     implementation "androidx.room:room-rxjava3:$rootProject.roomVersion"
     implementation "androidx.room:room-paging:$rootProject.roomVersion"
-    implementation "androidx.work:work-runtime:$rootProject.workVersion"
-    implementation "androidx.work:work-rxjava3:$rootProject.workVersion"
-
-    implementation "com.google.code.gson:gson:$rootProject.gsonVersion"
-    implementation "com.github.bumptech.glide:glide:$rootProject.glideVersion"
-    implementation "com.google.dagger:hilt-android:$rootProject.hiltVersion"
-    implementation "com.jakewharton.timber:timber:$timberVersion"
-
-    androidTestAnnotationProcessor "com.google.dagger:hilt-android-compiler:$rootProject.hiltVersion"
-    androidTestImplementation "com.google.dagger:hilt-android-testing:$rootProject.hiltVersion"
-    androidTestImplementation "androidx.work:work-testing:$rootProject.workVersion"
     testImplementation "androidx.room:room-testing:$rootProject.roomVersion"
 
+    // DataStore
+    implementation "androidx.datastore:datastore:$rootProject.dataStoreVersion"
+    implementation "androidx.datastore:datastore-rxjava3:$rootProject.dataStoreVersion"
+
+    // Gson
+    implementation "com.google.code.gson:gson:$rootProject.gsonVersion"
+
+    // Test
+    androidTestImplementation "androidx.arch.core:core-testing:$rootProject.testCoreVersion"
     androidTestImplementation "androidx.test.ext:junit:$rootProject.testExtJunitVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$rootProject.espressoVersion"
     testImplementation "junit:junit:$rootProject.junitVersion"

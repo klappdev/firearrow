@@ -21,71 +21,59 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE  OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.kl.firearrow.ui;
+package org.kl.firearrow.ui.setting;
 
-import android.content.Context;
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
 import android.view.MenuItem;
 
-import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import dagger.hilt.android.AndroidEntryPoint;
+import androidx.core.app.NavUtils;
 
+import dagger.hilt.android.AndroidEntryPoint;
 import org.kl.firearrow.R;
-import org.kl.firearrow.setting.CommonSettings;
-import org.kl.firearrow.ui.setting.SettingActivityContract;
 
 @AndroidEntryPoint
-public class MainActivity extends AppCompatActivity {
-    static {
-        System.loadLibrary("firearrow");
-    }
-
-    private CommonSettings settings;
-
-    private final ActivityResultLauncher<Void> settingLauncher = registerForActivityResult(
-            new SettingActivityContract(), result -> {
-        if (result != null && result) {
-            MainActivity.this.recreate();
-        }
-    });
+public final class SettingActivity extends AppCompatActivity {
 
     @Override
-    protected void attachBaseContext(@NonNull Context base) {
-        this.settings = CommonSettings.getInstance(base);
-        final String language = settings.readLanguageSynchronously();
-
-        super.attachBaseContext(settings.setLocale(base, language));
-    }
-
-    @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.settings_activity);
 
-        settings.setTheme(getDelegate(), settings.hasDefaultTheme());
+        if (savedInstanceState == null) {
+            getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.settings, new SettingFragment(this::onSettingUpdated))
+                .commit();
+        }
 
-        setContentView((R.layout.activity_main));
-    }
+        final ActionBar actionBar = getSupportActionBar();
 
-    @Override
-    public boolean onCreateOptionsMenu(@Nullable Menu menu) {
-        final var inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_main, menu);
-
-        return super.onCreateOptionsMenu(menu);
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         final int id = item.getItemId();
 
-        if (id == R.id.action_settings) {
-            settingLauncher.launch(null);
+        if (id == android.R.id.home) {
+            NavUtils.navigateUpFromSameTask(this);
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void onSettingUpdated(boolean updated) {
+        final var result = new Intent().putExtra(
+            SettingActivityContract.RESULT_KEY, updated
+        );
+        setResult(Activity.RESULT_OK, result);
+        /*finish()*/;
     }
 }

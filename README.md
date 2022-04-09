@@ -11,7 +11,7 @@ The purpose of the application is to test, compare and measure time execution</b
 Features:
 ---------
   * filesystem - compare Java vs C++ erase file facilities
-  * async      - compare Java vs C++ asyncronously facilities
+  * async      - compare Java vs C++ asynchronously facilities
   * simd       - compare Java vs C++ vector instruction facilities
 
 Architecture:
@@ -36,7 +36,6 @@ Used third party libraries:
   * Glide
   * Hilt
   * RxJava3
-  * Jpml(pattern matching)
 
 Languages:
 ----------

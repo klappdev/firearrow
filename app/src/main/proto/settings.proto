@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+option java_package = "org.kl.firearrow";
+option java_multiple_files = true;
+
+message Settings {
+  string language = 1;
+  string theme = 2;
+}

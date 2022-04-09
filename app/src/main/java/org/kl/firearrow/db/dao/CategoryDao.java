@@ -23,7 +23,6 @@
  */
 package org.kl.firearrow.db.dao;
 
-import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
@@ -60,8 +59,11 @@ public interface CategoryDao {
     Single<Integer> getAllCount();
 
     @Query("SELECT * FROM category WHERE id_category = :id")
-    LiveData<Category> getById(long id);
+    Observable<Category> getById(long id);
 
     @Query("SELECT * FROM category")
-    LiveData<List<Category>> getAll();
+    Observable<List<Category>> getAll();
+
+    @Query("SELECT * FROM category WHERE name LIKE :name")
+    Observable<List<Category>> searchByName(String name);
 }

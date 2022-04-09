@@ -21,41 +21,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE  OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.kl.firearrow.db.repo;
+package org.kl.firearrow.ui.setting;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+
+import androidx.activity.result.contract.ActivityResultContract;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.util.List;
-
-import io.reactivex.rxjava3.core.Completable;
-import io.reactivex.rxjava3.core.Observable;
-
-import org.kl.firearrow.db.dao.CategoryDao;
-import org.kl.firearrow.model.Category;
-
-@Singleton
-public final class CategoryRepository {
-    private final CategoryDao categoryDao;
-
-    @Inject
-    public CategoryRepository(@NonNull CategoryDao categoryDao) {
-        this.categoryDao = categoryDao;
-    }
+public class SettingActivityContract extends ActivityResultContract<Void, Boolean> {
+    public final static String RESULT_KEY = "settings_update";
 
     @NonNull
-    public Observable<Category> getCategory(long id) {
-        return categoryDao.getById(id);
+    @Override
+    public Intent createIntent(@NonNull Context context, Void input) {
+        return new Intent(context, SettingActivity.class);
     }
 
-    @NonNull
-    public Observable<List<Category>> getCategories() {
-        return categoryDao.getAll();
-    }
-
-    @NonNull
-    public Completable createCategories(@NonNull List<Category> categories) {
-        return categoryDao.insertAll(categories);
+    @Override
+    public Boolean parseResult(int resultCode, @Nullable Intent intent) {
+        if (resultCode != Activity.RESULT_OK) {
+            return false;
+        } else {
+            return intent != null && intent.getExtras().getBoolean(RESULT_KEY);
+        }
     }
 }

@@ -21,41 +21,48 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE  OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.kl.firearrow.db.repo;
+package org.kl.firearrow.setting;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.datastore.core.Serializer;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.util.List;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
-import io.reactivex.rxjava3.core.Completable;
-import io.reactivex.rxjava3.core.Observable;
+import kotlin.Unit;
+import kotlin.coroutines.Continuation;
+import timber.log.Timber;
 
-import org.kl.firearrow.db.dao.CategoryDao;
-import org.kl.firearrow.model.Category;
+import org.kl.firearrow.Settings;
 
-@Singleton
-public final class CategoryRepository {
-    private final CategoryDao categoryDao;
-
-    @Inject
-    public CategoryRepository(@NonNull CategoryDao categoryDao) {
-        this.categoryDao = categoryDao;
+public final class SettingSerializer implements Serializer<Settings> {
+    @Override
+    public Settings getDefaultValue() {
+        return Settings.getDefaultInstance();
     }
 
-    @NonNull
-    public Observable<Category> getCategory(long id) {
-        return categoryDao.getById(id);
+    @Nullable
+    @Override
+    public Settings readFrom(@NonNull InputStream inputStream, @NonNull Continuation<? super Settings> continuation) {
+        try {
+            return Settings.parseFrom(inputStream);
+        } catch (IOException e) {
+            Timber.e("Can't write to *.proto file");
+            return getDefaultValue();
+        }
     }
 
-    @NonNull
-    public Observable<List<Category>> getCategories() {
-        return categoryDao.getAll();
-    }
+    @Nullable
+    @Override
+    public Object writeTo(Settings settings, @NonNull OutputStream outputStream, @NonNull Continuation<? super Unit> continuation) {
+        try {
+            settings.writeTo(outputStream);
+        } catch (IOException e) {
+            Timber.e("Can't write to *.proto file");
+        }
 
-    @NonNull
-    public Completable createCategories(@NonNull List<Category> categories) {
-        return categoryDao.insertAll(categories);
+        return null;
     }
 }

@@ -24,10 +24,11 @@
 package org.kl.firearrow.viewmodel;
 
 import androidx.annotation.NonNull;
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 
 import dagger.hilt.android.lifecycle.HiltViewModel;
+import io.reactivex.rxjava3.core.Observable;
+
 import javax.inject.Inject;
 import java.util.List;
 
@@ -37,7 +38,7 @@ import org.kl.firearrow.model.Category;
 @HiltViewModel
 public final class CategoryListViewModel extends ViewModel {
     private final CategoryRepository categoryRepository;
-    private LiveData<List<Category>> categories;
+    private Observable<List<Category>> categories;
 
     @Inject
     public CategoryListViewModel(@NonNull CategoryRepository categoryRepository) {
@@ -45,7 +46,7 @@ public final class CategoryListViewModel extends ViewModel {
     }
 
     @NonNull
-    public LiveData<List<Category>> getCategories() {
+    public Observable<List<Category>> getCategories() {
         if (categories == null) {
             this.categories = categoryRepository.getCategories();
         }
