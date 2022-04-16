@@ -76,7 +76,7 @@ public final class ChangeThemeListener implements Preference.OnPreferenceChangeL
                     oldTheme = newTheme;
                 }
                 @Override public void onError(@NonNull Throwable e) {
-                    toast(context, "Can't change theme: " + theme + " " + e.getMessage());
+                    toast(context, "Can't change theme " + theme + ": " + e.getMessage());
                 }
             }));
 

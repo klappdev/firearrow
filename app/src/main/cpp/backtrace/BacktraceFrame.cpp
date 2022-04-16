@@ -24,7 +24,7 @@
 
 #include "BacktraceFrame.hpp"
 
-#include "../util/strings/StringUtil.hpp"
+#include <util/strings/StringUtil.hpp>
 
 namespace kl::backtrace {
     BacktraceFrame::BacktraceFrame()

@@ -21,30 +21,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE  OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#pragma once
+package org.kl.firearrow.model;
 
-#include <jni.h>
+import lombok.EqualsAndHashCode;
 
-#include <util/nullability/NonNull.hpp>
-#include <util/nullability/Nullable.hpp>
+public abstract class Result<T, E> {
 
-namespace kl::jni {
-    using namespace util::nullability;
+    protected Result() {}
 
-    class UniqueUtfChars final {
-    public:
-        UniqueUtfChars(const NonNull<JNIEnv*>& env, jstring jvmString);
-        ~UniqueUtfChars();
+    @lombok.Value
+    @EqualsAndHashCode(callSuper = true)
+    public class Value extends Result<T, E> {
+        private T value;
+        private long time;
+    }
 
-        UniqueUtfChars(const UniqueUtfChars&) = delete;
-        UniqueUtfChars& operator=(const UniqueUtfChars&) = delete;
-
-        const Nullable<const char*>& get() const;
-        size_t size() const;
-
-    private:
-        NonNull<JNIEnv*> env;
-        Nullable<const char*> rawChars;
-        jstring jvmString;
-    };
+    @lombok.Value
+    @EqualsAndHashCode(callSuper = true)
+    public class Error extends Result<T, E> {
+        private E error;
+    }
 }

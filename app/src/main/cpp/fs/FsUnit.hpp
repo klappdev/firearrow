@@ -24,19 +24,20 @@
 #pragma once
 
 namespace kl::fs::literals {
+
     inline constexpr unsigned long long int operator""_kb(unsigned long long int value) {
-        return 1024u * value;
+        return 1024ull * value;
     }
 
     inline constexpr unsigned long long int operator""_mb(unsigned long long int value) {
-        return 1024u * 1024u * value;
+        return 1024_kb * value;
     }
 
     inline constexpr unsigned long long int operator""_gb(unsigned long long int value) {
-        return 1024u * 1024u * 1024u * value;
+        return 1024_mb * value;
     }
 
     inline constexpr unsigned long long int operator""_tb(unsigned long long int value) {
-        return 1024u * 1024u * 1024u * 1024u * value;
+        return 1024_gb * value;
     }
 }

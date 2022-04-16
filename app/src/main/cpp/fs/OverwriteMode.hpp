@@ -23,26 +23,23 @@
  */
 #pragma once
 
-#include "../util/enumeration/Enumeration.hpp"
+#include <util/enumeration/Enumeration.hpp>
 
 namespace kl::fs {
-    using namespace util::enumeration;
 
     enum class OverwriteMode {
         SIMPLE_MODE  = 1,
         DOE_MODE     = 3,
         OPENBSD_MODE = 4,
         RCMP_MODE    = 5,
-        DOD_MODE     = 7,
-        GUTMAN_MODE  = 35
+        DOD_MODE     = 7
     };
 
-    inline constexpr Enumeration<OverwriteMode, 6> overwriteMode({
+    inline constexpr util::enumeration::Enumeration<OverwriteMode, 5> overwriteMode = {
         {OverwriteMode::SIMPLE_MODE, "SIMPLE_MODE"},
         {OverwriteMode::DOE_MODE, "DOE_MODE"},
         {OverwriteMode::OPENBSD_MODE, "OPENBSD_MODE"},
         {OverwriteMode::RCMP_MODE, "RCMP_MODE"},
-        {OverwriteMode::DOD_MODE, "DOD_MODE"},
-        {OverwriteMode::GUTMAN_MODE, "GUTMAN_MODE"}
-    });
+        {OverwriteMode::DOD_MODE, "DOD_MODE"}
+    };
 }

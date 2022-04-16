@@ -1,11 +1,15 @@
 cmake_minimum_required(VERSION 3.18.1)
 project("firearrow")
 
+# include main directory
+include_directories(.)
+
 set(CMAKE_CXX_STANDARD 20)
 
 # coroutines support
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcoroutines-ts -std=c++2a -Wall")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcoroutines-ts -Wall")
 
+# include source files
 add_library(firearrow SHARED
         core/LoadLibrary.cpp
 
@@ -47,3 +51,7 @@ target_link_libraries(firearrow
         unwind
         c++abi
 )
+
+#include tests configuration
+set(TEST_SRC_DIR ../../test/cpp)
+include(../../test/cpp/CMakeLists.txt)

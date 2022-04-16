@@ -30,8 +30,7 @@ public enum OverwriteMode {
     DOE_MODE(3),
     OPENBSD_MODE(3),
     RCMP_MODE(3),
-    DOD_MODE(7),
-    GUTMAN_MODE(35);
+    DOD_MODE(7);
 
     @Getter
     private final int number;

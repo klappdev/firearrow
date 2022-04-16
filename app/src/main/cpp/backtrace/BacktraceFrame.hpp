@@ -38,12 +38,11 @@ namespace kl::backtrace {
 
         explicit operator bool() const noexcept;
 
-        const std::string sourceFile;
-        const std::string sourceFunction;
-        const uintptr_t absoluteAddress;
-        const uintptr_t offset;
+        std::string sourceFile;
+        std::string sourceFunction;
+        uintptr_t absoluteAddress;
+        uintptr_t offset;
 
-        //FIXME: change to use operator<=>
         bool operator==(const BacktraceFrame& other) const;
     };
 

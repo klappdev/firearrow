@@ -24,10 +24,9 @@
 #pragma once
 
 #include "NullabilityConcepts.hpp"
-#include "../../jni/JniException.hpp"
+#include <jni/JniException.hpp>
 
 namespace kl::util::nullability {
-    using namespace jni;
 
     template<Pointer T>
     class Nullable {
@@ -52,16 +51,18 @@ namespace kl::util::nullability {
         Nullable& operator=(T value) {
             pointer = value;
             initialized = value;
+            return *this;
         }
 
         Nullable& operator=(std::nullptr_t) {
-            pointer == nullptr;
+            pointer = nullptr;
             initialized = false;
+            return *this;
         };
 
         constexpr auto get(const char* reason = "") const
             -> std::conditional_t<std::is_copy_constructible_v<T>, T, const T&> {
-            if (!initialized || !pointer) jniThrowNullPointerException<T>(reason);
+            if (!initialized || !pointer) jni::jniThrowNullPointerException<T>(reason);
             return pointer;
         }
 

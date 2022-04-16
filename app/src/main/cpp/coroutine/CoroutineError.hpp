@@ -25,20 +25,20 @@
 
 #include <string>
 
-#include "../util/string/StringUtil.hpp"
-#include "../util/property/Getter.hpp"
+#include <util/string/StringUtil.hpp>
+#include <util/property/Getter.hpp>
 
 namespace kl::coroutine {
 
     class CoroutineError final {
     public:
 
-        CoroutineError(const std::string& message) : message(errorMessage), errorMessage(message) {}
-        CoroutineError(std::string&& message) : message(errorMessage), errorMessage(std::move(message)) {}
+        CoroutineError(const std::string& text) : message(errorMessage), errorMessage(text) {}
+        CoroutineError(std::string&& errorMessage) : message(errorMessage), errorMessage(std::move(text)) {}
 
         template<typename... Args>
         CoroutineError::CoroutineError(const char* formatter, Args&&... arguments) : message(errorMessage) {
-            message = format(formatter, std::forward<Args>(arguments)...);
+            errorMessage = format(formatter, std::forward<Args>(arguments)...);
         }
 
         ~CoroutineError() = default;
@@ -46,6 +46,6 @@ namespace kl::coroutine {
         Getter<std::string&> message;
 
     private:
-        std::string message;
+        std::string errorMessage;
     };
 }

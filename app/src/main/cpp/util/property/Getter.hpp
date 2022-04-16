@@ -41,11 +41,10 @@ namespace kl::util::property {
         constexpr Getter& operator=(Getter&&) noexcept = default;
 
         constexpr operator T() const { return get(); }
-        constexpr const T& get() { return value; }
+        constexpr const T& get() const { return value; }
 
         constexpr bool operator==(const T& other) const { return value == other; }
         constexpr auto operator<=>(const T& other) const { return value <=> other; }
-        constexpr auto operator<=>(const Getter<T>& other) const = default;
 
     private:
         T value;

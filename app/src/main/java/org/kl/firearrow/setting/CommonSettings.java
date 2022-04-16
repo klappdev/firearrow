@@ -62,9 +62,9 @@ public final class CommonSettings {
     private CommonSettings(@NonNull Context context, @NonNull String name) {
         this.dataStore = new RxDataStoreBuilder<>(context, name, new SettingSerializer()).build();
 
-        this.availableThemes = context.getResources().getStringArray(R.array.language_short_names);
+        this.availableThemes = context.getResources().getStringArray(R.array.theme_names);
         this.availableLanguages = context.getResources().getStringArray(R.array.language_full_names);
-        this.availableCodeLanguages = context.getResources().getStringArray(R.array.theme_names);
+        this.availableCodeLanguages = context.getResources().getStringArray(R.array.language_short_names);
 
         DEFAULT_LANGUAGE = availableCodeLanguages[0];
         DEFAULT_THEME = availableThemes[0];

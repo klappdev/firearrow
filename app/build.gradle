@@ -21,6 +21,9 @@ android {
         externalNativeBuild {
             cmake {
                 cppFlags '-std=c++2a'
+
+                arguments "-DENABLE_CPP_TESTS=" + getEnableNativeTests().toString()
+                arguments "-DANDROID_SDK_ROOT=" + getAndroidSdkRoot().toString()
             }
         }
         ndk {
@@ -139,4 +142,18 @@ dependencies {
     testImplementation "junit:junit:$rootProject.junitVersion"
     testImplementation "org.mockito:mockito-core:$rootProject.mockitoVersion"
     testImplementation "org.robolectric:robolectric:$rootProject.robolectricVersion"
+}
+
+def getEnableNativeTests() {
+    return getNativeProperties().getProperty('enableCppTests', 'true').toBoolean()
+}
+
+def getAndroidSdkRoot() {
+    return getNativeProperties().getProperty('sdk.dir', '').toString()
+}
+
+def getNativeProperties() {
+    Properties properties = new Properties()
+    properties.load(new File(rootDir.absolutePath + '/local.properties').newDataInputStream())
+    return properties
 }

@@ -52,7 +52,6 @@ namespace kl::util::property {
 
         constexpr bool operator==(const T& other) const { return value == other; }
         constexpr auto operator<=>(const T& other) const { return value <=> other; }
-        constexpr auto operator<=>(const Setter<T>& other) const = default;
 
     private:
         T value;

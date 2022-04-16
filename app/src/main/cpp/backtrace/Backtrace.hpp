@@ -35,7 +35,7 @@ namespace kl::backtrace {
     public:
         using Iterator = std::vector<BacktraceFrame>::const_iterator;
 
-        Backtrace() = default;
+        Backtrace();
         ~Backtrace() = default;
 
         Backtrace(const Backtrace&) = default;
@@ -55,7 +55,6 @@ namespace kl::backtrace {
         Iterator begin() const noexcept;
         Iterator end() const noexcept;
 
-        //FIXME: change to use operator<=>
         bool operator==(const Backtrace& other) const;
 
     private:

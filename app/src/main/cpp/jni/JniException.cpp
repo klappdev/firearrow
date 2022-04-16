@@ -24,7 +24,7 @@
 
 #include <jni.h>
 
-#include "../backtrace/Backtrace.hpp"
+#include <backtrace/Backtrace.hpp>
 #include "JniException.hpp"
 #include "UniqueJniEnv.hpp"
 

@@ -25,8 +25,8 @@
 
 #include <string>
 
-#include "../util/strings/StringUtil.hpp"
-#include "../util/property/Getter.hpp"
+#include <util/strings/StringUtil.hpp>
+#include <util/property/Getter.hpp>
 
 namespace kl::fs {
     using namespace util::strings;
@@ -34,8 +34,8 @@ namespace kl::fs {
 
     class FsError final {
     public:
-        FsError(const std::string& message) : message(errorMessage), errorMessage(message) {}
-        FsError(std::string&& message) : message(errorMessage), errorMessage(std::move(message)) {}
+        FsError(const std::string& text) : message(errorMessage), errorMessage(text) {}
+        FsError(std::string&& text) : message(errorMessage), errorMessage(std::move(text)) {}
 
         template<typename... Args>
         FsError(const char* formatter, Args&&... arguments) : message(errorMessage) {

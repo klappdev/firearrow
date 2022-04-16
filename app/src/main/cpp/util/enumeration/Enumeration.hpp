@@ -26,7 +26,7 @@
 #include <array>
 #include <cstring>
 
-#include "../arrays/ArrayUtils.hpp"
+#include <util/arrays/ArrayUtils.hpp>
 #include "EnumerationConcepts.hpp"
 
 namespace kl::util::enumeration {
@@ -34,7 +34,7 @@ namespace kl::util::enumeration {
     template<Enumerable E, std::size_t N>
     class Enumeration {
     public:
-        constexpr explicit Enumeration(const std::initializer_list<std::pair<E, const char*>> list)
+        constexpr Enumeration(const std::initializer_list<std::pair<E, const char*>> list)
             : data(arrays::makeArray<std::pair<E, const char*>, N>(list)) {}
         ~Enumeration() = default;
 
@@ -51,7 +51,7 @@ namespace kl::util::enumeration {
             return "<unknown>";
         }
 
-        constexpr std::array<const char*, N> names() {
+        constexpr std::array<const char*, N> names() const {
             std::array<const char*, N> result;
 
             for (std::size_t i = 0; i < data.size(); i++) {

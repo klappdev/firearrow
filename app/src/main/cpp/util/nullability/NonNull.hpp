@@ -24,22 +24,21 @@
 #pragma once
 
 #include "NullabilityConcepts.hpp"
-#include "../../jni/JniException.hpp"
+#include <jni/JniException.hpp>
 
 namespace kl::util::nullability {
-    using namespace jni;
 
     template<Pointer T>
     class NonNull {
     public:
         constexpr NonNull(T value) requires NonNullPointer<T> : pointer(std::move(value)) {
-            if (!pointer) jniThrowNullPointerException<T>("Construct from null pointer");
+            if (!pointer) jni::jniThrowNullPointerException<T>("Construct from null pointer");
         }
 
         //FIXME: change to use concepts
         template<typename U, typename = std::enable_if_t<std::is_convertible_v<U, T>>>
         constexpr NonNull(U&& value) : pointer(std::forward<U>(value)) {
-            if (!pointer) jniThrowNullPointerException<T>("Construct from null pointer");
+            if (!pointer) jni::jniThrowNullPointerException<T>("Construct from null pointer");
         }
 
         //FIXME: change to use concepts
@@ -54,7 +53,7 @@ namespace kl::util::nullability {
 
         constexpr auto get(const char* reason = "") const
             -> std::conditional_t<std::is_copy_constructible_v<T>, T, const T&> {
-            if (!pointer) jniThrowNullPointerException<T>(reason);
+            if (!pointer) jni::jniThrowNullPointerException<T>(reason);
             return pointer;
         }
 

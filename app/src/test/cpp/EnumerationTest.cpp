@@ -21,30 +21,39 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE  OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#pragma once
 
-#include <jni.h>
+#include <gtest/gtest.h>
 
-#include <util/nullability/NonNull.hpp>
-#include <util/nullability/Nullable.hpp>
+#include <util/enumeration/Enumeration.hpp>
 
-namespace kl::jni {
-    using namespace util::nullability;
+namespace kl::test {
+    using kl::util::enumeration::Enumeration;
 
-    class UniqueUtfChars final {
-    public:
-        UniqueUtfChars(const NonNull<JNIEnv*>& env, jstring jvmString);
-        ~UniqueUtfChars();
-
-        UniqueUtfChars(const UniqueUtfChars&) = delete;
-        UniqueUtfChars& operator=(const UniqueUtfChars&) = delete;
-
-        const Nullable<const char*>& get() const;
-        size_t size() const;
-
-    private:
-        NonNull<JNIEnv*> env;
-        Nullable<const char*> rawChars;
-        jstring jvmString;
+    enum class Season {
+        SPRING, SUMMER, AUTUMN, WINTER
     };
+
+    static inline constexpr Enumeration<Season, 4> seasons = {
+        {Season::SPRING, "Spring"},
+        {Season::SUMMER, "Summer"},
+        {Season::AUTUMN, "Autumn"},
+        {Season::WINTER, "Winter"},
+    };
+
+    TEST(EnumerationTest, createEnumerationTest) {
+        EXPECT_EQ(seasons.count(), 4);
+        EXPECT_EQ(seasons.ordinal(Season::SPRING), 0);
+    }
+
+    TEST(EnumerationTest, compareEnumerationNamesTest) {
+        constexpr std::array<const char*, 4> names = {"Spring", "Summer", "Autumn", "Winter"};
+        EXPECT_STREQ(seasons.name(Season::SUMMER), "Summer");
+        EXPECT_EQ(seasons.names(), names);
+    }
+
+    TEST(EnumerationTest, compareEnumerationValuesTest) {
+        constexpr std::array<Season, 4> values = {Season::SPRING, Season::SUMMER, Season::AUTUMN, Season::WINTER};
+        EXPECT_EQ(seasons.value("Winter"), Season::WINTER);
+        EXPECT_EQ(seasons.values(), values);
+    }
 }

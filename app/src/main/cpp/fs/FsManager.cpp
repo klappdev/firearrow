@@ -34,9 +34,9 @@
 #include "FsEraser.hpp"
 #include "OverwriteMode.hpp"
 
-#include "../jni/UniqueUtfChars.hpp"
-#include "../util/nullability/NonNull.hpp"
-#include "../util/nullability/Nullable.hpp"
+#include <jni/UniqueUtfChars.hpp>
+#include <util/nullability/NonNull.hpp>
+#include <util/nullability/Nullable.hpp>
 
 namespace {
     jclass eraseExceptionClass = nullptr;

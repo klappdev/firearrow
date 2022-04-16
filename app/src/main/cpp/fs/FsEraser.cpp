@@ -27,9 +27,9 @@
 #include <string>
 
 #include "FsUnit.hpp"
-#include "../logging/Logging.hpp"
-#include "../util/functional/Match.hpp"
-#include "../util/strings/StringUtil.hpp"
+#include <logging/Logging.hpp>
+#include <util/functional/Match.hpp>
+#include <util/strings/StringUtil.hpp>
 
 namespace kl::fs {
     using fs::literals::operator""_kb;
@@ -215,116 +215,6 @@ namespace kl::fs {
                 return static_cast<FsError>(result.error());
             }
             if (auto result = overwriteRandom(7); result.hasError()) {
-                return static_cast<FsError>(result.error());
-            }
-            break;
-        case OverwriteMode::GUTMAN_MODE:
-            if (auto result = overwriteRandom(1); result.hasError()) {
-                return static_cast<FsError>(result.error());
-            }
-            if (auto result = overwriteRandom(2); result.hasError()) {
-                return static_cast<FsError>(result.error());
-            }
-            if (auto result = overwriteRandom(3); result.hasError()) {
-                return static_cast<FsError>(result.error());
-            }
-            if (auto result = overwriteRandom(4); result.hasError()) {
-                return static_cast<FsError>(result.error());
-            }
-            if (auto result = overwriteByte(5, 0x55); result.hasError()) {
-                return static_cast<FsError>(result.error());
-            }
-            if (auto result = overwriteByte(6, 0xAA); result.hasError()) {
-                return static_cast<FsError>(result.error());
-            }
-            if (auto result = overwriteBytes(7, "’I$"); result.hasError()) { /* 0x92, 0x49, 0x24 */
-                return static_cast<FsError>(result.error());
-            }
-            if (auto result = overwriteBytes(8, "I$’"); result.hasError()) { /* 0x49, 0x24, 0x92 */
-                return static_cast<FsError>(result.error());
-            }
-            if (auto result = overwriteBytes(9, "$’I"); result.hasError()) { /* 0x24, 0x92, 0x49 */
-                return static_cast<FsError>(result.error());
-            }
-            if (auto result = overwriteByte(10, 0x00); result.hasError()) {
-                return static_cast<FsError>(result.error());
-            }
-            if (auto result = overwriteByte(11, 0x11); result.hasError()) {
-                return static_cast<FsError>(result.error());
-            }
-            if (auto result = overwriteByte(12, 0x22); result.hasError()) {
-                return static_cast<FsError>(result.error());
-            }
-            if (auto result = overwriteByte(13, 0x33); result.hasError()) {
-                return static_cast<FsError>(result.error());
-            }
-            if (auto result = overwriteByte(14, 0x44); result.hasError()) {
-                return static_cast<FsError>(result.error());
-            }
-            if (auto result = overwriteByte(15, 0x55); result.hasError()) {
-                return static_cast<FsError>(result.error());
-            }
-            if (auto result = overwriteByte(16, 0x66); result.hasError()) {
-                return static_cast<FsError>(result.error());
-            }
-            if (auto result = overwriteByte(17, 0x77); result.hasError()) {
-                return static_cast<FsError>(result.error());
-            }
-            if (auto result = overwriteByte(18, 0x88); result.hasError()) {
-                return static_cast<FsError>(result.error());
-            }
-            if (auto result = overwriteByte(19, 0x99); result.hasError()) {
-                return static_cast<FsError>(result.error());
-            }
-            if (auto result = overwriteByte(20, 0xAA); result.hasError()) {
-                return static_cast<FsError>(result.error());
-            }
-            if (auto result = overwriteByte(21, 0xBB); result.hasError()) {
-                return static_cast<FsError>(result.error());
-            }
-            if (auto result = overwriteByte(22, 0xCC); result.hasError()) {
-                return static_cast<FsError>(result.error());
-            }
-            if (auto result = overwriteByte(23, 0xDD); result.hasError()) {
-                return static_cast<FsError>(result.error());
-            }
-            if (auto result = overwriteByte(24, 0xEE); result.hasError()) {
-                return static_cast<FsError>(result.error());
-            }
-            if (auto result = overwriteByte(25, 0xFF); result.hasError()) {
-                return static_cast<FsError>(result.error());
-            }
-            if (auto result = overwriteBytes(26, "’I$"); result.hasError()) { /* 0x92, 0x49, 0x24 */
-                return static_cast<FsError>(result.error());
-            }
-            if (auto result = overwriteBytes(27, "I$’"); result.hasError()) { /* 0x49, 0x24, 0x92 */
-                return static_cast<FsError>(result.error());
-            }
-            if (auto result = overwriteBytes(28, "$’I"); result.hasError()) { /* 0x24, 0x92, 0x49 */
-                return static_cast<FsError>(result.error());
-            }
-            if (auto result = overwriteBytes(29, "m¶Û"); result.hasError()) { /* 0x6D, 0xB6, 0xDB */
-                return static_cast<FsError>(result.error());
-            }
-            if (auto result = overwriteBytes(30, "¶Ûm"); result.hasError()) { /* 0xB6, 0xDB, 0x6D */
-                return static_cast<FsError>(result.error());
-            }
-            if (auto result = overwriteBytes(31, "Ûm¶"); result.hasError()) { /* 0xDB, 0x6D, 0xB6 */
-                return static_cast<FsError>(result.error());
-            }
-            if (auto result = overwriteRandom(32); result.hasError()) {
-                return static_cast<FsError>(result.error());
-            }
-            if (auto result = overwriteRandom(33); result.hasError()) {
-                return static_cast<FsError>(result.error());
-            }
-            if (auto result = overwriteRandom(34); result.hasError()) {
-                return static_cast<FsError>(result.error());
-            }
-            if (auto result = overwriteRandom(35); result.hasError()) {
-                return static_cast<FsError>(result.error());
-            }
-            if (auto result = overwriteByte(36, 0x00); result.hasError()) {
                 return static_cast<FsError>(result.error());
             }
             break;

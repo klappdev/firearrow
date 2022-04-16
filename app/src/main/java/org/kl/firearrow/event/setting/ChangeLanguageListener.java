@@ -74,7 +74,7 @@ public final class ChangeLanguageListener implements Preference.OnPreferenceChan
                     oldLanguage = newLanguage;
                 }
                 @Override public void onError(@NonNull Throwable e) {
-                    toast(context, "Can't change language: " + language + " " + e.getMessage());
+                    toast(context, "Can't change language " + language + ": " + e.getMessage());
                 }
             }));
 

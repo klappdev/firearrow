@@ -23,7 +23,7 @@
  */
 #include <jni.h>
 
-#include "../logging/Logging.hpp"
+#include <logging/Logging.hpp>
 
 JavaVM* globalJavaVm;
 

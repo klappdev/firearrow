@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include "../util/strings/StringUtil.hpp"
+#include <util/strings/StringUtil.hpp>
 
 namespace kl::jni {
     using namespace util::strings;

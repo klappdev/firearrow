@@ -36,8 +36,8 @@
 #include "FsUtil.hpp"
 #include "FsError.hpp"
 
-#include "../util/property/Property.hpp"
-#include "../util/functional/Result.hpp"
+#include <util/property/Property.hpp>
+#include <util/functional/Result.hpp>
 
 namespace kl::fs {
     using namespace util::functional;

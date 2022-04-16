@@ -26,7 +26,7 @@
 #include <string>
 #include <memory>
 
-#include "../util/functional/Result.hpp"
+#include <util/functional/Result.hpp>
 #include "FsError.hpp"
 
 namespace kl::fs {

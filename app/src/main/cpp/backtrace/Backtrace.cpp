@@ -24,8 +24,8 @@
 
 #include "Backtrace.hpp"
 
-#include "../util/strings/StringUtil.hpp"
-#include "../logging/Logging.hpp"
+#include <util/strings/StringUtil.hpp>
+#include <logging/Logging.hpp>
 
 #include <unwind.h>
 #include <cxxabi.h>
@@ -33,6 +33,11 @@
 
 namespace kl::backtrace {
     static constexpr const char* const TAG = "Backtrace-JNI";
+
+    Backtrace::Backtrace()
+        : countFrames(0)
+        , maxCountFrames(0) {
+    }
 
     bool Backtrace::empty() const noexcept { return countFrames == 0; }
     size_t Backtrace::size() const noexcept { return countFrames; }
