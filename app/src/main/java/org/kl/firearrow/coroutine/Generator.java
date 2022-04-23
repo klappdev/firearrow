@@ -21,29 +21,46 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE  OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.kl.firearrow.di;
+package org.kl.firearrow.coroutine;
 
-import javax.inject.Singleton;
-import dagger.Module;
-import dagger.Provides;
+import androidx.annotation.NonNull;
 
-import dagger.hilt.InstallIn;
-import dagger.hilt.components.SingletonComponent;
-import io.reactivex.rxjava3.disposables.CompositeDisposable;
-import org.kl.firearrow.ui.common.ViewValidator;
+import java.util.Iterator;
 
-@Module
-@InstallIn(SingletonComponent.class)
-public class CommonModule {
+import lombok.Getter;
 
-    @Provides
-    @Singleton
-    public ViewValidator provideViewValidator() {
-        return new ViewValidator();
+public final class Generator<E extends Number> implements Iterable<E> {
+    private final Object[] array;
+    @Getter
+    private final long duration;
+
+    public Generator(Object[] array, long duration) {
+        this.array = array;
+        this.duration = duration;
     }
 
-    @Provides
-    public CompositeDisposable provideCompositeDisposable() {
-        return new CompositeDisposable();
+    @NonNull
+    @Override
+    public Iterator<E> iterator() {
+        return new GeneratorIterator();
+    }
+
+    private class GeneratorIterator implements Iterator<E> {
+        private int index = 0;
+
+        @Override
+        public boolean hasNext() {
+            return index < array.length && array[index] != null;
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public E next() {
+            if (index >= array.length) {
+                throw new IndexOutOfBoundsException("index: " + index + ", size: " + array.length);
+            }
+
+            return (E) array[index++];
+        }
     }
 }

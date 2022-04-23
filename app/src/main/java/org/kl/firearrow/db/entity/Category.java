@@ -21,35 +21,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE  OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.kl.firearrow.model;
+package org.kl.firearrow.db.entity;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
-import androidx.room.ForeignKey;
 import androidx.room.PrimaryKey;
 
 import lombok.Value;
-import lombok.With;
 
 @Value
-@Entity(tableName = "feature",
-    foreignKeys = {
-        @ForeignKey(
-            entity = Category.class,
-            parentColumns = "id_category",
-            childColumns = "id_category_feature"
-        )
-    }
-)
-public class Feature {
+@Entity(tableName = "category")
+public final class Category {
     @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = "id_feature")
+    @ColumnInfo(name = "id_category")
     private long id;
-
-    @With
-    @ColumnInfo(name = "id_category_feature")
-    private long idCategory;
     private String name;
-    @With
-    private String date;
+    private String description;
+
+    @ColumnInfo(name = "icon_url")
+    private String iconUrl;
 }

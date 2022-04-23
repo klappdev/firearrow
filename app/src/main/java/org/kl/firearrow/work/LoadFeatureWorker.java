@@ -44,7 +44,7 @@ import org.kl.firearrow.db.CommonDatabase;
 import org.kl.firearrow.db.dao.FeatureDao;
 import org.kl.firearrow.util.AssetManagerUtils;
 import org.kl.firearrow.db.dao.CategoryDao;
-import org.kl.firearrow.model.Feature;
+import org.kl.firearrow.db.entity.Feature;
 import org.kl.firearrow.util.DateUtils;
 
 public final class LoadFeatureWorker extends RxWorker {

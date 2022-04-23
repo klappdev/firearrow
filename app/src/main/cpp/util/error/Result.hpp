@@ -25,7 +25,7 @@
 
 #include <variant>
 
-namespace kl::util::functional {
+namespace kl::util::error {
 
     template<typename V, typename E>
     class [[nodiscard]] Result {
@@ -59,8 +59,6 @@ namespace kl::util::functional {
             data = std::forward<V>(error);
             return *this;
         }
-
-        constexpr const std::variant<V, E>& get() const { return data; }
 
         constexpr bool hasValue() const { return data.index() == 0; }
         constexpr bool hasError() const { return data.index() == 1; }

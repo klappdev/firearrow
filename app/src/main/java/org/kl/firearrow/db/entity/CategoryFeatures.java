@@ -21,29 +21,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE  OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.kl.firearrow.di;
+package org.kl.firearrow.db.entity;
 
-import javax.inject.Singleton;
-import dagger.Module;
-import dagger.Provides;
+import androidx.room.Embedded;
+import androidx.room.Relation;
 
-import dagger.hilt.InstallIn;
-import dagger.hilt.components.SingletonComponent;
-import io.reactivex.rxjava3.disposables.CompositeDisposable;
-import org.kl.firearrow.ui.common.ViewValidator;
+import java.util.List;
+import lombok.Value;
 
-@Module
-@InstallIn(SingletonComponent.class)
-public class CommonModule {
+@Value
+public final class CategoryFeatures {
+    @Embedded
+    private Category category;
 
-    @Provides
-    @Singleton
-    public ViewValidator provideViewValidator() {
-        return new ViewValidator();
-    }
-
-    @Provides
-    public CompositeDisposable provideCompositeDisposable() {
-        return new CompositeDisposable();
-    }
+    @Relation(
+            parentColumn = "id_category",
+            entity = Feature.class,
+            entityColumn = "id_category_feature"
+    )
+    private List<Feature> features;
 }

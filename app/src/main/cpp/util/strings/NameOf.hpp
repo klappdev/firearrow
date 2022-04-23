@@ -23,26 +23,19 @@
  */
 #pragma once
 
-#include <string>
-#include <memory>
+#include <string_view>
 
-#include <util/functional/Result.hpp>
-#include "FsError.hpp"
+namespace kl::util::strings {
 
-namespace kl::fs {
-    using namespace util::functional;
+    template<typename T>
+    constexpr auto nameof() {
+        std::string_view name = __PRETTY_FUNCTION__;
+        std::string_view prefix = "auto kl::util::strings::nameof() [T = ";
+        std::string_view suffix = "]";
 
-    struct FileDeleter final {
-        void operator()(FILE *fd);
-    };
+        name.remove_prefix(prefix.size());
+        name.remove_suffix(suffix.size());
 
-    using FileUniquePtr = std::unique_ptr<FILE, FileDeleter>;
-
-    Result<FileUniquePtr, FsError> makeOpenFile(const std::string& path, const std::string& mode);
-
-    Result<std::size_t, FsError> blockSize(const std::string& path);
-    Result<std::uint32_t, FsError> countHardLinks(const std::string& path);
+        return name;
+    }
 }
-
-
-

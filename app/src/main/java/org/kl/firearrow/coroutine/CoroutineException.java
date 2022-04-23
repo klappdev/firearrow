@@ -21,23 +21,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE  OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.kl.firearrow.model;
+package org.kl.firearrow.coroutine;
 
-import androidx.room.ColumnInfo;
-import androidx.room.Entity;
-import androidx.room.PrimaryKey;
+public final class CoroutineException extends Exception {
+    private static final long serialVersionUID = 1L;
+    private final String message;
 
-import lombok.Value;
+    public CoroutineException(String message) {
+        super();
+        this.message = message;
+    }
 
-@Value
-@Entity(tableName = "category")
-public class Category {
-    @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = "id_category")
-    private long id;
-    private String name;
-    private String description;
-
-    @ColumnInfo(name = "icon_url")
-    private String iconUrl;
+    @Override
+    public String getMessage() {
+        return message;
+    }
 }

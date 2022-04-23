@@ -32,117 +32,82 @@
   {
     "id": 7,
     "idCategory" : 1,
-    "name" : "C++: Erase file with Gutman mode"
+    "name" : "Java: Delete directory"
   },
   {
     "id": 8,
     "idCategory" : 1,
-    "name" : "Java: Delete two files"
+    "name" : "C++: Erase directory"
   },
   {
     "id": 9,
     "idCategory" : 1,
-    "name" : "C++: Erase two files"
-  },
-  {
-    "id": 10,
-    "idCategory" : 1,
-    "name" : "Java: Delete directory"
-  },
-  {
-    "id": 11,
-    "idCategory" : 1,
-    "name" : "C++: Erase directory"
-  },
-  {
-    "id": 12,
-    "idCategory" : 1,
     "name" : "Java: Delete directory recursive"
   },
   {
-    "id": 13,
+    "id": 10,
     "idCategory" : 1,
     "name" : "C++: Erase directory recursive"
   },
 
   {
-    "id": 14,
+    "id": 11,
     "idCategory" : 2,
     "name" : "Java: Execute operation using thread"
   },
   {
+    "id": 12,
+    "idCategory" : 2,
+    "name" : "C++: Execute operation using coroutine with callbacks"
+  },
+  {
+    "id": 13,
+    "idCategory" : 2,
+    "name" : "Java: Execute operation using coroutine"
+  },
+  {
+    "id": 14,
+    "idCategory" : 2,
+    "name" : "C++: Execute operation using coroutine with result"
+  },
+  {
     "id": 15,
     "idCategory" : 2,
-    "name" : "C++: Execute operation using thread"
+    "name" : "Java: Generate numbers using stream api"
   },
   {
     "id": 16,
     "idCategory" : 2,
-    "name" : "Java: Execute operation using executor"
+    "name" : "C++: Generate numbers using generator"
   },
   {
     "id": 17,
     "idCategory" : 2,
-    "name" : "C++: Execute operation using coroutine task"
+    "name" : "Java: Generate numbers in sequence using stream api"
   },
   {
     "id": 18,
     "idCategory" : 2,
-    "name" : "Java: Execute operation using executor and get result"
-  },
-  {
-    "id": 19,
-    "idCategory" : 2,
-    "name" : "C++: Execute operation using coroutine task and get result"
-  },
-  {
-    "id": 20,
-    "idCategory" : 2,
-    "name" : "Java: Generate one number 10 times using stream api"
-  },
-  {
-    "id": 21,
-    "idCategory" : 2,
-    "name" : "C++: Generate one number 10 times using coroutine generator"
-  },
-  {
-    "id": 22,
-    "idCategory" : 2,
-    "name" : "Java: Generate sequence numbers from 1 to 1000"
-  },
-  {
-    "id": 23,
-    "idCategory" : 2,
-    "name" : "C++: Generate sequence numbers from 1 to 1000 using coroutine generator"
-  },
-  {
-    "id": 24,
-    "idCategory" : 2,
-    "name" : "Java: Generate one number 10 times in power 2"
-  },
-  {
-    "id": 25,
-    "idCategory" : 2,
-    "name" : "C++: Generate one number 10 times in power 2 using coroutine generator"
+    "name" : "C++: Generate numbers in sequence using generator"
   },
 
   {
-    "id": 26,
+    "id": 19,
     "idCategory" : 3,
     "name" : "Java: Calculate summary two sequence numbers"
   },
   {
-    "id": 27,
+    "id": 20,
     "idCategory" : 3,
     "name" : "C++:  Calculate summary two sequence numbers"
   },
   {
-    "id": 28,
+    "id": 21,
     "idCategory" : 3,
     "name" : "Java: Calculate summary two sequence numbers using stream api"
   },
   {
-    "id": 29,
+    "id": 22,
     "idCategory" : 3,
     "name" : "C++: Calculate summary two sequence numbers using simd api"
   }

@@ -26,7 +26,7 @@ package org.kl.firearrow.event.diff;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil;
 
-import org.kl.firearrow.model.Feature;
+import org.kl.firearrow.db.entity.Feature;
 
 public final class FeatureDifferenceCallback extends DiffUtil.ItemCallback<Feature> {
 

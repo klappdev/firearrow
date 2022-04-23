@@ -32,10 +32,10 @@ namespace {
     jclass errorClass = nullptr;
     jclass stacktraceElementClass = nullptr;
 
-    jmethodID exceptionConstructor = nullptr;
-    jmethodID causeExceptionConstructor = nullptr;
+    jmethodID exceptionConstructorId = nullptr;
+    jmethodID causeExceptionConstructorId = nullptr;
     jmethodID stacktraceElementConstructor = nullptr;
-    jmethodID setStackTraceMethod = nullptr;
+    jmethodID setStackTraceMethodId = nullptr;
 }
 
 void registerJniExceptions(JNIEnv* env) {
@@ -49,10 +49,10 @@ void registerJniExceptions(JNIEnv* env) {
     temporaryClass = env->FindClass("java/lang/StackTraceElement");
     stacktraceElementClass = (jclass) env->NewGlobalRef(temporaryClass);
 
-    exceptionConstructor = env->GetMethodID(errorClass, "<init>", "(Ljava/lang/String;)V");
-    causeExceptionConstructor = env->GetMethodID(errorClass, "<init>", "(Ljava/lang/String;Ljava/lang/Throwable;)V");
+    exceptionConstructorId = env->GetMethodID(errorClass, "<init>", "(Ljava/lang/String;)V");
+    causeExceptionConstructorId = env->GetMethodID(errorClass, "<init>", "(Ljava/lang/String;Ljava/lang/Throwable;)V");
     stacktraceElementConstructor = env->GetMethodID(stacktraceElementClass, "<init>", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)V");
-    setStackTraceMethod = env->GetMethodID(errorClass, "setStackTrace", "([Ljava/lang/StackTraceElement;)V");
+    setStackTraceMethodId = env->GetMethodID(errorClass, "setStackTrace", "([Ljava/lang/StackTraceElement;)V");
 }
 
 void unregisterJniExceptions(JNIEnv* env) {
@@ -63,10 +63,9 @@ void unregisterJniExceptions(JNIEnv* env) {
 }
 
 namespace kl::jni {
-    using namespace backtrace;
+    using namespace kl::backtrace;
 
     static void prepareStacktraceElement(JNIEnv* env, const Backtrace& backtrace, jobjectArray elements) {
-        if (!env) return;
         jsize index = 0;
 
         for (const auto& [fileName, functionName, address, offset] : backtrace) {
@@ -81,7 +80,7 @@ namespace kl::jni {
         }
     }
 
-    void jniThrowException(const std::string& message) {
+    void jvmThrowException(const std::string& message) {
         UniqueJniEnv uniqueJniEnv;
         JNIEnv* env = uniqueJniEnv.get();
 
@@ -96,17 +95,17 @@ namespace kl::jni {
         auto backtrace = Backtrace::current(/*skip=*/4);
 
         if (!backtrace.empty()) {
-            auto cause = (jthrowable) env->NewObject(errorClass, exceptionConstructor, jvmMessage);
+            auto cause = (jthrowable) env->NewObject(errorClass, exceptionConstructorId, jvmMessage);
             jobjectArray elements = env->NewObjectArray(backtrace.size(), stacktraceElementClass, nullptr);
 
             if (elements != nullptr) {
                 prepareStacktraceElement(env, backtrace, elements);
-                env->CallVoidMethod(cause, setStackTraceMethod, elements);
+                env->CallVoidMethod(cause, setStackTraceMethodId, elements);
             }
 
-            exception = (jthrowable) env->NewObject(errorClass, causeExceptionConstructor, jvmMessage, cause);
+            exception = (jthrowable) env->NewObject(errorClass, causeExceptionConstructorId, jvmMessage, cause);
         } else {
-            exception = (jthrowable) env->NewObject(errorClass, exceptionConstructor, jvmMessage);
+            exception = (jthrowable) env->NewObject(errorClass, exceptionConstructorId, jvmMessage);
         }
 
         if (exception != nullptr) {

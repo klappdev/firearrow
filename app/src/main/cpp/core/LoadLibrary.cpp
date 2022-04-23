@@ -29,8 +29,10 @@ JavaVM* globalJavaVm;
 
 extern int registerJniExceptions(JNIEnv*);
 extern void unregisterJniExceptions(JNIEnv*);
-extern int registerFilesystemManager(JNIEnv*);
-extern void unregisterFilesystemManager(JNIEnv*);
+extern int registerFileManager(JNIEnv *rawEnv);
+extern void unregisterFileManager(JNIEnv *rawEnv);
+extern int registerCoroutineManager(JNIEnv*);
+extern void unregisterCoroutineManager(JNIEnv*);
 
 static constexpr jint JNI_DEFAULT_VERSION = JNI_VERSION_1_6;
 static constexpr const char* const TAG = "LoadLibrary-JNI";
@@ -46,8 +48,13 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* jvm, [[maybe_unused]] void*
 
     registerJniExceptions(env);
 
-    if (registerFilesystemManager(env) != 0) {
-        kl::log::error(TAG, "Could not register jni components");
+    if (registerFileManager(env) != 0) {
+        kl::log::error(TAG, "Could not register filesystem manager");
+        return JNI_ERR;
+    }
+
+    if (registerCoroutineManager(env) != 0) {
+        kl::log::error(TAG, "Could not register coroutine manager");
         return JNI_ERR;
     }
 
@@ -65,7 +72,8 @@ extern "C" JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *jvm, [[maybe_unused]] voi
     }
 
     unregisterJniExceptions(env);
-    unregisterFilesystemManager(env);
+    unregisterFileManager(env);
+    unregisterCoroutineManager(env);
 
     kl::log::info(TAG, "Unload jni library");
 }

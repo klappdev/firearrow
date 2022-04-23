@@ -27,7 +27,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.kl.firearrow.databinding.CategoryItemBinding;
-import org.kl.firearrow.model.Category;
+import org.kl.firearrow.db.entity.Category;
 
 public final class CategoryViewHolder extends RecyclerView.ViewHolder {
     private final CategoryItemBinding binding;

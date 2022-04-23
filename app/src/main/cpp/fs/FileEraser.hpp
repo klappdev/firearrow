@@ -23,47 +23,44 @@
  */
 #pragma once
 
-#if __has_include(<filesystem>)
-#   include <filesystem>
-#else
-#   error "missing header <filesystem>"
-#endif
-
+#include <filesystem>
 #include <memory>
 
 #include "EraseEntry.hpp"
 #include "OverwriteMode.hpp"
-#include "FsUtil.hpp"
-#include "FsError.hpp"
+#include "FileUtil.hpp"
+#include "FileError.hpp"
 
-#include <util/property/Property.hpp>
-#include <util/functional/Result.hpp>
+#include <util/error/Result.hpp>
 
 namespace kl::fs {
-    using namespace util::functional;
+    using namespace kl::util::error;
 
-    class FsEraser final {
+    class FileEraser final {
+    private:
+        FileEraser() = default;
+        ~FileEraser() = default;
+
     public:
-        FsEraser() = default;
-        ~FsEraser() = default;
+        static FileEraser& instance();
 
-        Result<std::size_t, FsError> init(const std::filesystem::path& path, OverwriteMode newMode);
+        Result<std::size_t, FileError> init(const std::filesystem::path& path, OverwriteMode newMode);
 
-        Result<std::size_t, FsError> checkPermission();
-        Result<std::size_t, FsError> removeFile();
-        Result<std::size_t, FsError> overwriteFile();
-        Result<std::size_t, FsError> truncateFile(size_t size);
+        Result<std::size_t, FileError> checkPermission();
+        Result<std::size_t, FileError> removeFile();
+        Result<std::size_t, FileError> overwriteFile();
+        Result<std::size_t, FileError> truncateFile(std::size_t size);
 
     private:
         void showPermission(std::filesystem::perms permission);
 
-        Result<std::size_t, FsError> overwriteByte(int pass, std::uint8_t symbol);
-        Result<std::size_t, FsError> overwriteBytes(int pass, const std::string& mask);
-        Result<std::size_t, FsError> overwriteRandom(int pass);
-        Result<std::size_t, FsError> overwriteBuffer(int pass);
+        Result<std::size_t, FileError> overwriteByte(int pass, std::uint8_t symbol);
+        Result<std::size_t, FileError> overwriteBytes(int pass, const std::string& mask);
+        Result<std::size_t, FileError> overwriteRandom(int pass);
+        Result<std::size_t, FileError> overwriteBuffer(int pass);
 
         std::size_t maskBuffer(const std::string& mask);
-        Result<std::size_t, FsError> writeBuffer(std::size_t count, std::size_t tail);
+        Result<std::size_t, FileError> writeBuffer(std::size_t count, std::size_t tail);
 
     private:
         std::unique_ptr<std::uint8_t[]> buffer;

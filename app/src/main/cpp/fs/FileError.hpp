@@ -25,27 +25,28 @@
 
 #include <string>
 
-#include <util/string/StringUtil.hpp>
+#include <util/strings/StringUtil.hpp>
 #include <util/property/Getter.hpp>
 
-namespace kl::coroutine {
+namespace kl::fs {
+    using namespace kl::util::strings;
+    using namespace kl::util::property;
 
-    class CoroutineError final {
+    class FileError final {
     public:
-
-        CoroutineError(const std::string& text) : message(errorMessage), errorMessage(text) {}
-        CoroutineError(std::string&& errorMessage) : message(errorMessage), errorMessage(std::move(text)) {}
+        explicit FileError(const std::string& text) : message(message_), message_(text) {}
+        explicit FileError(std::string&& text) : message(message_), message_(std::move(text)) {}
 
         template<typename... Args>
-        CoroutineError::CoroutineError(const char* formatter, Args&&... arguments) : message(errorMessage) {
-            errorMessage = format(formatter, std::forward<Args>(arguments)...);
+        explicit FileError(const char* formatter, Args&&... arguments) : message(message_) {
+            message_ = format(formatter, std::forward<Args>(arguments)...);
         }
 
-        ~CoroutineError() = default;
+        ~FileError() = default;
 
         Getter<std::string&> message;
 
     private:
-        std::string errorMessage;
+        std::string message_;
     };
 }

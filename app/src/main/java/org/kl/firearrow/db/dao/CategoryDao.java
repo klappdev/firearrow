@@ -36,7 +36,7 @@ import io.reactivex.rxjava3.core.Single;
 
 import java.util.List;
 
-import org.kl.firearrow.model.Category;
+import org.kl.firearrow.db.entity.Category;
 
 @Dao
 public interface CategoryDao {

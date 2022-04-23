@@ -7,7 +7,7 @@
     <data>
         <variable
             name="feature"
-            type="org.kl.firearrow.model.Feature" />
+            type="org.kl.firearrow.db.entity.Feature" />
     </data>
 
     <LinearLayout

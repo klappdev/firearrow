@@ -50,7 +50,7 @@ namespace kl::backtrace {
     }
 
     std::string toString(const BacktraceFrame& frame) {
-        using util::strings::format;
+        using kl::util::strings::format;
 
         const auto& [fileName, functionName, address, offset] = frame;
 

@@ -21,29 +21,50 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE  OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.kl.firearrow.di;
 
-import javax.inject.Singleton;
-import dagger.Module;
-import dagger.Provides;
+#include "FileUtil.hpp"
 
-import dagger.hilt.InstallIn;
-import dagger.hilt.components.SingletonComponent;
-import io.reactivex.rxjava3.disposables.CompositeDisposable;
-import org.kl.firearrow.ui.common.ViewValidator;
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <cerrno>
 
-@Module
-@InstallIn(SingletonComponent.class)
-public class CommonModule {
+namespace kl::fs {
 
-    @Provides
-    @Singleton
-    public ViewValidator provideViewValidator() {
-        return new ViewValidator();
+    void FileDeleter::operator()(FILE *fd)  {
+        if (fd != nullptr) {
+            ::fclose(fd);
+        }
     }
 
-    @Provides
-    public CompositeDisposable provideCompositeDisposable() {
-        return new CompositeDisposable();
+    Result<FileUniquePtr, FileError> makeOpenFile(const std::string& path, const std::string& mode) {
+        FILE *handle = ::fopen(path.c_str(), mode.c_str());
+
+        if (handle == nullptr) {
+            return FileError("Can't open file %s, error %s", path.c_str(), ::strerror(errno));
+        }
+
+        return FileUniquePtr(handle);
+    }
+
+    Result<std::size_t, FileError> blockSize(const std::string& path) {
+        struct stat fileInfo = {};
+
+        if (::lstat(path.c_str(), &fileInfo) == -1) {
+            return FileError("Can't get file %s status , error %s", path.c_str(), ::strerror(errno));
+        }
+
+        std::size_t size = fileInfo.st_blksize;
+
+        return size > 16 ? size : 512;
+    }
+
+    Result<std::uint32_t, FileError> countHardLinks(const std::string& path) {
+        struct stat fileInfo = {};
+
+        if (::lstat(path.c_str(), &fileInfo) < 0) {
+            return FileError("Can't get file %s status, error %s", path.c_str(), ::strerror(errno));
+        }
+
+        return static_cast<std::uint32_t>(fileInfo.st_nlink);
     }
 }

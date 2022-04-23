@@ -41,7 +41,7 @@ import java.util.List;
 
 import org.kl.firearrow.db.CommonDatabase;
 import org.kl.firearrow.db.dao.CategoryDao;
-import org.kl.firearrow.model.Category;
+import org.kl.firearrow.db.entity.Category;
 import org.kl.firearrow.util.AssetManagerUtils;
 
 public final class LoadCategoryWorker extends RxWorker {

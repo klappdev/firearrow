@@ -32,13 +32,13 @@ namespace kl::util::nullability {
     class NonNull {
     public:
         constexpr NonNull(T value) requires NonNullPointer<T> : pointer(std::move(value)) {
-            if (!pointer) jni::jniThrowNullPointerException<T>("Construct from null pointer");
+            if (!pointer) jni::jvmThrowNullPointerException<T>("Construct from null pointer");
         }
 
         //FIXME: change to use concepts
         template<typename U, typename = std::enable_if_t<std::is_convertible_v<U, T>>>
         constexpr NonNull(U&& value) : pointer(std::forward<U>(value)) {
-            if (!pointer) jni::jniThrowNullPointerException<T>("Construct from null pointer");
+            if (!pointer) jni::jvmThrowNullPointerException<T>("Construct from null pointer");
         }
 
         //FIXME: change to use concepts
@@ -53,7 +53,7 @@ namespace kl::util::nullability {
 
         constexpr auto get(const char* reason = "") const
             -> std::conditional_t<std::is_copy_constructible_v<T>, T, const T&> {
-            if (!pointer) jni::jniThrowNullPointerException<T>(reason);
+            if (!pointer) jni::jvmThrowNullPointerException<T>(reason);
             return pointer;
         }
 

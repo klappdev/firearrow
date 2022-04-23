@@ -21,13 +21,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE  OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+package org.kl.firearrow.fs;
 
-#pragma once
+public final class FileManager {
 
-#include <type_traits>
+    private FileManager() throws IllegalAccessException {
+        throw new IllegalAccessException("Can't create instance");
+    }
 
-namespace kl::util::enumeration {
+    public static native long eraseFile(String path) throws FileException;
 
-    template<typename E>
-    concept Enumerable = std::is_enum_v<E>;
+    public static native long eraseFile(String path, OverwriteMode mode) throws FileException;
+
+    public static native long eraseDirectory(String path, boolean recursive) throws FileException;
+
+    public static native long eraseDirectory(String path, OverwriteMode mode, boolean recursive) throws FileException;
 }

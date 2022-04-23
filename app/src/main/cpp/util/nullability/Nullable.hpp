@@ -62,7 +62,7 @@ namespace kl::util::nullability {
 
         constexpr auto get(const char* reason = "") const
             -> std::conditional_t<std::is_copy_constructible_v<T>, T, const T&> {
-            if (!initialized || !pointer) jni::jniThrowNullPointerException<T>(reason);
+            if (!initialized || !pointer) jni::jvmThrowNullPointerException<T>(reason);
             return pointer;
         }
 

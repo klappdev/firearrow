@@ -32,7 +32,7 @@ import androidx.recyclerview.widget.ListAdapter;
 import lombok.Getter;
 import lombok.Setter;
 
-import org.kl.firearrow.model.Category;
+import org.kl.firearrow.db.entity.Category;
 import org.kl.firearrow.databinding.CategoryItemBinding;
 import org.kl.firearrow.event.diff.CategoryDifferenceCallback;
 import org.kl.firearrow.event.category.ChooseCategoryListener;

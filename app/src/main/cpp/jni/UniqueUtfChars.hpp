@@ -29,7 +29,7 @@
 #include <util/nullability/Nullable.hpp>
 
 namespace kl::jni {
-    using namespace util::nullability;
+    using namespace kl::util::nullability;
 
     class UniqueUtfChars final {
     public:
@@ -40,7 +40,7 @@ namespace kl::jni {
         UniqueUtfChars& operator=(const UniqueUtfChars&) = delete;
 
         const Nullable<const char*>& get() const;
-        size_t size() const;
+        std::size_t size() const;
 
     private:
         NonNull<JNIEnv*> env;

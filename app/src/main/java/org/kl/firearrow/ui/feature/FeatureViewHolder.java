@@ -29,7 +29,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.kl.firearrow.databinding.FeatureItemBinding;
-import org.kl.firearrow.model.Feature;
+import org.kl.firearrow.db.entity.Feature;
 
 public final class FeatureViewHolder extends RecyclerView.ViewHolder {
     private final FeatureItemBinding binding;

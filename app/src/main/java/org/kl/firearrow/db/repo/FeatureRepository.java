@@ -39,7 +39,7 @@ import io.reactivex.rxjava3.core.Single;
 
 import org.kl.firearrow.db.dao.CategoryFeaturesDao;
 import org.kl.firearrow.db.dao.FeatureDao;
-import org.kl.firearrow.model.Feature;
+import org.kl.firearrow.db.entity.Feature;
 
 @Singleton
 public final class FeatureRepository {

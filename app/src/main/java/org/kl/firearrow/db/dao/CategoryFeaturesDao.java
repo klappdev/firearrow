@@ -28,7 +28,7 @@ import androidx.room.Dao;
 import androidx.room.Query;
 import androidx.room.Transaction;
 
-import org.kl.firearrow.model.CategoryFeatures;
+import org.kl.firearrow.db.entity.CategoryFeatures;
 
 @Dao
 public interface CategoryFeaturesDao {

@@ -22,24 +22,28 @@
  * SOFTWARE.
  */
 
-#include "FsEraser.hpp"
+#include "FileEraser.hpp"
 
 #include <string>
 
-#include "FsUnit.hpp"
+#include "FileUnit.hpp"
 #include <logging/Logging.hpp>
-#include <util/functional/Match.hpp>
 #include <util/strings/StringUtil.hpp>
 
 namespace kl::fs {
     using fs::literals::operator""_kb;
     using fs::literals::operator""_gb;
 
-    using namespace util::strings;
+    using namespace kl::util::strings;
 
-    static constexpr const char* TAG = "FsEraser-JNI";
+    static constexpr const char* TAG = "FileEraser-JNI";
 
-    Result<std::size_t, FsError> FsEraser::init(const std::filesystem::path& newPath, OverwriteMode newMode) {
+    FileEraser& FileEraser::instance() {
+        static FileEraser eraser;
+        return eraser;
+    }
+
+    Result<std::size_t, FileError> FileEraser::init(const std::filesystem::path& newPath, OverwriteMode newMode) {
         this->path = newPath;
 
         std::string errorMessage;
@@ -49,21 +53,13 @@ namespace kl::fs {
         } else {
             errorMessage = "File doesn't exist";
             log::error(TAG, errorMessage);
-            return FsError(errorMessage);
+            return FileError(errorMessage);
         }
 
         if (!std::filesystem::is_regular_file(path)) {
             errorMessage = "File isn't regular file or symlink";
             log::error(TAG, errorMessage);
-            return FsError(errorMessage);
-        }
-
-        if (auto fileSize = std::filesystem::file_size(path); fileSize >= 0 || fileSize < 2_gb) {
-            eraseEntry.fileSize = fileSize;
-        } else {
-            errorMessage = "File size can't be negative or more 2GB";
-            log::error(TAG, errorMessage);
-            return FsError(errorMessage);
+            return FileError(errorMessage);
         }
 
         if (auto result = blockSize(path); result.hasValue()) {
@@ -71,21 +67,22 @@ namespace kl::fs {
         } else {
             std::string& message = result.error().message;
             log::error(TAG, message);
-            return static_cast<FsError>(result.error());
+            return static_cast<FileError>(result.error());
         }
 
         if (auto result = countHardLinks(path); result.hasError()) {
             errorMessage = "Count hard link must only be one";
             log::error(TAG, errorMessage);
-            return FsError(errorMessage);
+            return FileError(errorMessage);
         }
 
+        eraseEntry.fileSize = std::filesystem::file_size(path);
         eraseEntry.mode = newMode;
 
         return 0;
     }
 
-    Result<std::size_t, FsError> FsEraser::checkPermission() {
+    Result<std::size_t, FileError> FileEraser::checkPermission() {
         std::filesystem::perms permission = std::filesystem::status(path).permissions();
         showPermission(permission);
 
@@ -95,13 +92,13 @@ namespace kl::fs {
         std::filesystem::permissions(path, rwPermissions, std::filesystem::perm_options::add, errorCode);
 
         if (errorCode) {
-            return FsError(errorCode.message());
+            return FileError(errorCode.message());
         }
 
         return 0;
     }
 
-    void FsEraser::showPermission(std::filesystem::perms permission) {
+    void FileEraser::showPermission(std::filesystem::perms permission) {
         log::debug(TAG, "owner permission: %s-%s-%s",
               ((permission & std::filesystem::perms::owner_read) != std::filesystem::perms::none ? "r" : "-"),
               ((permission & std::filesystem::perms::owner_write) != std::filesystem::perms::none ? "w" : "-"),
@@ -118,25 +115,25 @@ namespace kl::fs {
               ((permission & std::filesystem::perms::others_exec) != std::filesystem::perms::none ? "x" : "-"));
     }
 
-    Result<std::size_t, FsError> FsEraser::removeFile() {
+    Result<std::size_t, FileError> FileEraser::removeFile() {
         std::string parentPath = path.parent_path();
         std::string fileName = path.filename();
         std::filesystem::path copyPath = path;
         std::error_code errorCode = {};
 
-        fileName = random(fileName.size());
+        fileName = randomBuffer(fileName.size());
         copyPath.replace_filename(path);
 
         std::filesystem::rename(path, copyPath, errorCode);
 
         if (errorCode) {
-            return FsError(errorCode.message());
+            return FileError(errorCode.message());
         }
 
         std::filesystem::remove(copyPath, errorCode);
 
         if (errorCode) {
-            return FsError(errorCode.message());
+            return FileError(errorCode.message());
         }
 
         log::debug(TAG, "Remove file: %s", fileName.c_str());
@@ -144,13 +141,13 @@ namespace kl::fs {
         return 0;
     }
 
-    Result<std::size_t, FsError> FsEraser::truncateFile(size_t size) {
+    Result<std::size_t, FileError> FileEraser::truncateFile(std::size_t size) {
         std::error_code errorCode = {};
 
         std::filesystem::resize_file(path, size, errorCode);
 
         if (errorCode) {
-            return FsError(errorCode.message());
+            return FileError(errorCode.message());
         }
 
         log::debug(TAG, "Truncate file: %s", eraseEntry.fileName.c_str());
@@ -158,64 +155,64 @@ namespace kl::fs {
         return 0;
     }
 
-    Result<std::size_t, FsError> FsEraser::overwriteFile() {
+    Result<std::size_t, FileError> FileEraser::overwriteFile() {
         switch (eraseEntry.mode) {
         case OverwriteMode::SIMPLE_MODE:
             return overwriteByte(1, 0x00);
         case OverwriteMode::DOE_MODE:
             if (auto result = overwriteRandom(1); result.hasError()) {
-                return static_cast<FsError>(result.error());
+                return static_cast<FileError>(result.error());
             }
             if (auto result = overwriteRandom(2); result.hasError()) {
-                return static_cast<FsError>(result.error());
+                return static_cast<FileError>(result.error());
             }
             if (auto result = overwriteBytes(3, "DoE"); result.hasError()) {
-                return static_cast<FsError>(result.error());
+                return static_cast<FileError>(result.error());
             }
             break;
         case OverwriteMode::OPENBSD_MODE:
             if (auto result = overwriteByte(1, 0xFF); result.hasError()) {
-                return static_cast<FsError>(result.error());
+                return static_cast<FileError>(result.error());
             }
             if (auto result = overwriteByte(2, 0x00); result.hasError()) {
-                return static_cast<FsError>(result.error());
+                return static_cast<FileError>(result.error());
             }
             if (auto result = overwriteByte(3, 0xFF); result.hasError()) {
-                return static_cast<FsError>(result.error());
+                return static_cast<FileError>(result.error());
             }
             break;
         case OverwriteMode::RCMP_MODE:
             if (auto result = overwriteByte(1, 0x00); result.hasError()) {
-                return static_cast<FsError>(result.error());
+                return static_cast<FileError>(result.error());
             }
             if (auto result = overwriteByte(2, 0xFF); result.hasError()) {
-                return static_cast<FsError>(result.error());
+                return static_cast<FileError>(result.error());
             }
             if (auto result = overwriteBytes(3, "RCMP"); result.hasError()) {
-                return static_cast<FsError>(result.error());
+                return static_cast<FileError>(result.error());
             }
             break;
         case OverwriteMode::DOD_MODE:
             if (auto result = overwriteByte(1, 0xF6); result.hasError()) {
-                return static_cast<FsError>(result.error());
+                return static_cast<FileError>(result.error());
             }
             if (auto result = overwriteByte(2, 0x00); result.hasError()) {
-                return static_cast<FsError>(result.error());
+                return static_cast<FileError>(result.error());
             }
             if (auto result = overwriteByte(3, 0xFF); result.hasError()) {
-                return static_cast<FsError>(result.error());
+                return static_cast<FileError>(result.error());
             }
             if (auto result = overwriteRandom(4); result.hasError()) {
-                return static_cast<FsError>(result.error());
+                return static_cast<FileError>(result.error());
             }
             if (auto result = overwriteByte(5, 0x00); result.hasError()) {
-                return static_cast<FsError>(result.error());
+                return static_cast<FileError>(result.error());
             }
             if (auto result = overwriteByte(6, 0xFF); result.hasError()) {
-                return static_cast<FsError>(result.error());
+                return static_cast<FileError>(result.error());
             }
             if (auto result = overwriteRandom(7); result.hasError()) {
-                return static_cast<FsError>(result.error());
+                return static_cast<FileError>(result.error());
             }
             break;
         }
@@ -223,7 +220,7 @@ namespace kl::fs {
         return 0;
     }
 
-    Result<std::size_t, FsError> FsEraser::overwriteByte(int pass, std::uint8_t byte) {
+    Result<std::size_t, FileError> FileEraser::overwriteByte(int pass, std::uint8_t byte) {
         const auto& [fileName, fileSize, bufferSize, mode] = eraseEntry;
 
         this->buffer = std::make_unique<uint8_t[]>(bufferSize);
@@ -236,13 +233,13 @@ namespace kl::fs {
         if (auto result = makeOpenFile(fileName, "r+b"); result.hasValue()) {
             this->file = std::move(result.value());
         } else {
-            return static_cast<FsError>(result.error());
+            return static_cast<FileError>(result.error());
         }
 
         return overwriteBuffer(pass);
     }
 
-    Result<std::size_t, FsError> FsEraser::overwriteBytes(int pass, const std::string& mask) {
+    Result<std::size_t, FileError> FileEraser::overwriteBytes(int pass, const std::string& mask) {
         const auto& [fileName, fileSize, bufferSize, mode] = eraseEntry;
 
         buffer = std::make_unique<uint8_t[]>(bufferSize);
@@ -255,16 +252,16 @@ namespace kl::fs {
         if (auto result = makeOpenFile(fileName, "r+b"); result.hasValue()) {
             this->file = std::move(result.value());
         } else {
-            return static_cast<FsError>(result.error());
+            return static_cast<FileError>(result.error());
         }
 
         return overwriteBuffer(pass);
     }
 
-    Result<std::size_t, FsError> FsEraser::overwriteRandom(int pass) {
+    Result<std::size_t, FileError> FileEraser::overwriteRandom(int pass) {
         const auto& [fileName, fileSize, bufferSize, mode] = eraseEntry;
 
-        std::string randomData = random(bufferSize);
+        std::string randomData = randomBuffer(bufferSize);
         buffer = std::make_unique<uint8_t[]>(bufferSize);
 
         std::copy(randomData.begin(), randomData.end(), buffer.get());
@@ -276,13 +273,13 @@ namespace kl::fs {
         if (auto result = makeOpenFile(fileName, "r+b"); result.hasValue()) {
             this->file = std::move(result.value());
         } else {
-            return static_cast<FsError>(result.error());
+            return static_cast<FileError>(result.error());
         }
 
         return overwriteBuffer(pass);
     }
 
-    Result<std::size_t, FsError> FsEraser::overwriteBuffer(int pass) {
+    Result<std::size_t, FileError> FileEraser::overwriteBuffer(int pass) {
         const auto& [fileName, fileSize, bufferSize, mode] = eraseEntry;
 
         const size_t count = fileSize / bufferSize;
@@ -297,19 +294,19 @@ namespace kl::fs {
         if (::fseek(file.get(), 0, SEEK_SET) != 0) {
             errorMessage = "Fail seek in file";
             log::error(TAG, errorMessage);
-            return FsError(errorMessage);
+            return FileError(errorMessage);
         }
 
         if (auto result = writeBuffer(count, tail); result.hasValue()) {
             written = result.value();
         } else {
-            return static_cast<FsError>(result.error());
+            return static_cast<FileError>(result.error());
         }
 
         if (written != fileSize) {
             errorMessage = "Fail overwrite all file";
             log::error(TAG, errorMessage);
-            return FsError(errorMessage);
+            return FileError(errorMessage);
         }
 
         ::fflush(file.get());
@@ -317,7 +314,7 @@ namespace kl::fs {
         if (::fseek(file.get(), 0, SEEK_SET) != 0) {
             errorMessage = "Fail seek in file";
             log::error(TAG, errorMessage);
-            return FsError(errorMessage);
+            return FileError(errorMessage);
         }
 
         file.reset();
@@ -325,7 +322,7 @@ namespace kl::fs {
         return written;
     }
 
-    std::size_t FsEraser::maskBuffer(const std::string& mask) {
+    std::size_t FileEraser::maskBuffer(const std::string& mask) {
         for (size_t j = 0, i = eraseEntry.bufferSize - 1; i >= 0; i--) {
             buffer[i] = mask[j];
 
@@ -337,7 +334,7 @@ namespace kl::fs {
         return mask.size();
     }
 
-    Result<std::size_t, FsError> FsEraser::writeBuffer(std::size_t count, std::size_t tail) {
+    Result<std::size_t, FileError> FileEraser::writeBuffer(std::size_t count, std::size_t tail) {
         const auto& [fileName, fileSize, bufferSize, mode] = eraseEntry;
         std::size_t written = 0;
         std::string errorMessage;
@@ -349,7 +346,7 @@ namespace kl::fs {
                 } else {
                     errorMessage = "Fail write buffer to file";
                     log::error(TAG, errorMessage);
-                    return FsError(errorMessage);
+                    return FileError(errorMessage);
                 }
             }
         }
@@ -359,7 +356,7 @@ namespace kl::fs {
         } else {
             errorMessage = "Fail write tail buffer to file";
             log::error(TAG, errorMessage);
-            return FsError(errorMessage);
+            return FileError(errorMessage);
         }
 
         log::debug(TAG, "File written %lu with size %lu", written, fileSize);

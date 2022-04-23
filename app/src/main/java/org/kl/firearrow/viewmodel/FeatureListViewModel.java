@@ -34,7 +34,7 @@ import io.reactivex.rxjava3.core.Observable;
 import javax.inject.Inject;
 
 import org.kl.firearrow.db.repo.FeatureRepository;
-import org.kl.firearrow.model.Feature;
+import org.kl.firearrow.db.entity.Feature;
 
 import java.util.Optional;
 

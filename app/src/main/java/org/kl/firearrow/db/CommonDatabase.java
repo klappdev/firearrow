@@ -34,8 +34,8 @@ import org.kl.firearrow.db.dao.CategoryDao;
 import org.kl.firearrow.db.dao.CategoryFeaturesDao;
 import org.kl.firearrow.db.dao.FeatureDao;
 import org.kl.firearrow.event.db.LoadInitDBCallback;
-import org.kl.firearrow.model.Category;
-import org.kl.firearrow.model.Feature;
+import org.kl.firearrow.db.entity.Category;
+import org.kl.firearrow.db.entity.Feature;
 
 @Database(
     entities = {

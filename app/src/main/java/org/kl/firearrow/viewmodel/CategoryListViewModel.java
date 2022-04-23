@@ -33,7 +33,7 @@ import javax.inject.Inject;
 import java.util.List;
 
 import org.kl.firearrow.db.repo.CategoryRepository;
-import org.kl.firearrow.model.Category;
+import org.kl.firearrow.db.entity.Category;
 
 @HiltViewModel
 public final class CategoryListViewModel extends ViewModel {

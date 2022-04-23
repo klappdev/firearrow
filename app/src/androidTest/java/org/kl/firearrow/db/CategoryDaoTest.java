@@ -39,7 +39,7 @@ import org.junit.runner.RunWith;
 import java.util.List;
 
 import org.kl.firearrow.db.dao.CategoryDao;
-import org.kl.firearrow.model.Category;
+import org.kl.firearrow.db.entity.Category;
 
 @RunWith(AndroidJUnit4.class)
 public class CategoryDaoTest {

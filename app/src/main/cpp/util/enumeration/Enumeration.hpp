@@ -27,15 +27,18 @@
 #include <cstring>
 
 #include <util/arrays/ArrayUtils.hpp>
-#include "EnumerationConcepts.hpp"
 
 namespace kl::util::enumeration {
+
+    template<typename E>
+    concept Enumerable = std::is_enum_v<E>;
 
     template<Enumerable E, std::size_t N>
     class Enumeration {
     public:
         constexpr Enumeration(const std::initializer_list<std::pair<E, const char*>> list)
             : data(arrays::makeArray<std::pair<E, const char*>, N>(list)) {}
+
         ~Enumeration() = default;
 
         [[nodiscard]] constexpr std::size_t count() const { return data.size(); }

@@ -24,18 +24,19 @@
 
 #pragma once
 
+#include <util/strings/NameOf.hpp>
 #include <util/strings/StringUtil.hpp>
 
 namespace kl::jni {
-    using namespace util::strings;
+    using namespace kl::util::strings;
 
-    void jniThrowException(const std::string& message);
+    void jvmThrowException(const std::string& message);
 
     template<typename T>
-    void jniThrowNullPointerException(const char* message) {
+    void jvmThrowNullPointerException(const char* message) {
         if (!message) return;
 
         std::string reason = format("(%s) %s", std::string(nameof<T>()).c_str(), message);
-        jniThrowException(reason);
+        jvmThrowException(reason);
     }
 }

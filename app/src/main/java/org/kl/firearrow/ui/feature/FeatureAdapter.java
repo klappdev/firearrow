@@ -36,17 +36,14 @@ import lombok.Setter;
 import org.kl.firearrow.databinding.FeatureItemBinding;
 import org.kl.firearrow.event.diff.FeatureDifferenceCallback;
 import org.kl.firearrow.event.feature.ChooseFeatureListener;
-import org.kl.firearrow.event.feature.FeatureMapper;
-import org.kl.firearrow.model.Feature;
+import org.kl.firearrow.db.entity.Feature;
 
 public final class FeatureAdapter extends PagingDataAdapter<Feature, FeatureViewHolder> {
-    private final FeatureMapper featureMapper;
     @Setter
     private int position = -1;
 
-    public FeatureAdapter(@NonNull FeatureMapper featureMapper) {
+    public FeatureAdapter() {
         super(new FeatureDifferenceCallback());
-        this.featureMapper = featureMapper;
     }
 
     @NonNull
@@ -64,9 +61,8 @@ public final class FeatureAdapter extends PagingDataAdapter<Feature, FeatureView
         final var feature = getItem(position);
 
         if (feature != null) {
-            final var mapper = featureMapper.findById((int) feature.getId());
             holder.bind(feature);
-            holder.getBindingRoot().setOnClickListener(new ChooseFeatureListener(mapper));
+            holder.getBindingRoot().setOnClickListener(new ChooseFeatureListener(feature.getId()));
         }
     }
 

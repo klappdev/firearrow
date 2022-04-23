@@ -13,12 +13,14 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcoroutines-ts -Wall")
 add_library(firearrow SHARED
         core/LoadLibrary.cpp
 
+        coroutine/CoroutineManager.cpp
+
         backtrace/BacktraceFrame.cpp
         backtrace/Backtrace.cpp
 
-        fs/FsManager.cpp
-        fs/FsEraser.cpp
-        fs/FsUtil.cpp
+        fs/FileManager.cpp
+        fs/FileEraser.cpp
+        fs/FileUtil.cpp
 
         jni/UniqueUtfChars.cpp
         jni/UniqueJniEnv.cpp
@@ -28,7 +30,7 @@ add_library(firearrow SHARED
         util/strings/StringUtil.cpp
 )
 
-set(CLANG_VERSION 12.0.5)
+set(CLANG_VERSION 14.0.1)
 
 # libunwind.a
 add_library(unwind STATIC IMPORTED)

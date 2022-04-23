@@ -33,7 +33,7 @@ import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Observable;
 
 import org.kl.firearrow.db.dao.CategoryDao;
-import org.kl.firearrow.model.Category;
+import org.kl.firearrow.db.entity.Category;
 
 @Singleton
 public final class CategoryRepository {

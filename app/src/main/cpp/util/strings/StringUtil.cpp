@@ -29,7 +29,7 @@
 
 namespace kl::util::strings {
 
-    std::string random(std::size_t length) {
+    std::string randomBuffer(std::size_t length) {
         const std::string characters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
         std::random_device randomDevice;

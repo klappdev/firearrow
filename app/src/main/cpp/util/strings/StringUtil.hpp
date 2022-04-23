@@ -24,25 +24,12 @@
 #pragma once
 
 #include <string>
-#include <string_view>
 
 namespace kl::util::strings {
 
-    std::string random(std::size_t length);
+    std::string randomBuffer(std::size_t length);
 
     bool contains(const std::string& input, const std::string& substring);
-
-    template<typename T>
-    constexpr auto nameof() {
-        std::string_view name = __PRETTY_FUNCTION__;
-        std::string_view prefix = "auto kl::util::strings::nameof() [T = ";
-        std::string_view suffix = "]";
-
-        name.remove_prefix(prefix.size());
-        name.remove_suffix(suffix.size());
-
-        return name;
-    }
 
     template<typename... Args>
     std::string format(const char* formatter, Args... arguments) {

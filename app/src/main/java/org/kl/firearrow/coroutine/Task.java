@@ -21,32 +21,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE  OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#pragma once
+package org.kl.firearrow.coroutine;
 
-#include <string>
+import lombok.Value;
 
-#include <util/strings/StringUtil.hpp>
-#include <util/property/Getter.hpp>
-
-namespace kl::fs {
-    using namespace util::strings;
-    using namespace util::property;
-
-    class FsError final {
-    public:
-        FsError(const std::string& text) : message(errorMessage), errorMessage(text) {}
-        FsError(std::string&& text) : message(errorMessage), errorMessage(std::move(text)) {}
-
-        template<typename... Args>
-        FsError(const char* formatter, Args&&... arguments) : message(errorMessage) {
-            errorMessage = format(formatter, std::forward<Args>(arguments)...);
-        }
-
-        ~FsError() = default;
-
-        Getter<std::string&> message;
-
-    private:
-        std::string errorMessage;
-    };
+@Value
+public final class Task<T> {
+    private T value;
+    private boolean finished;
+    private long duration;
 }

@@ -22,16 +22,12 @@
  * SOFTWARE.
  */
 
-#if __has_include(<filesystem>)
-#   include <filesystem>
-#else
-#   error "missing header <filesystem>"
-#endif
-
+#include <filesystem>
+#include <chrono>
 #include <array>
 #include <jni.h>
 
-#include "FsEraser.hpp"
+#include "FileEraser.hpp"
 #include "OverwriteMode.hpp"
 
 #include <jni/UniqueUtfChars.hpp>
@@ -39,7 +35,7 @@
 #include <util/nullability/Nullable.hpp>
 
 namespace {
-    jclass eraseExceptionClass = nullptr;
+    jclass fileExceptionClass = nullptr;
     jclass overwriteModeClass = nullptr;
 
     jfieldID simpleModeFieldId = nullptr;
@@ -50,95 +46,76 @@ using namespace kl::util::nullability;
 
 namespace kl::fs {
 
-    static FsEraser& getEraser() {
-        static FsEraser eraser;
-        return eraser;
-    }
-
-    jboolean nativeEraseFile(JNIEnv* rawEnv, jclass clazz, jstring jvmPath, jobject jvmOverwriteMode) {
+    jlong nativeEraseFile(JNIEnv* rawEnv, jclass clazz, jstring jvmPath, jobject jvmOverwriteMode) {
         auto env = makeNonNull(rawEnv);
+        auto& eraser = FileEraser::instance();
+
         const auto jvmUniquePath = jni::UniqueUtfChars(env, jvmPath);
         const auto filePath = std::filesystem::path(static_cast<const char*>(jvmUniquePath.get()));
 
         const auto modeName = (jstring) env->CallObjectMethod(jvmOverwriteMode, nameMethodId);
         const auto jvmModeName = jni::UniqueUtfChars(env, modeName);
 
-        if (auto result = getEraser().init(filePath, overwriteMode.value(jvmModeName.get())); result.hasError()) {
+        auto beginTime = std::chrono::steady_clock::now();
+
+        if (auto result = eraser.init(filePath, overwriteMode.value(jvmModeName.get())); result.hasError()) {
             std::string& message = result.error().message;
-            env->ThrowNew(eraseExceptionClass, message.c_str());
-            return false;
+            env->ThrowNew(fileExceptionClass, message.c_str());
+            return -1LL;
         }
 
-        if (auto result = getEraser().checkPermission(); result.hasError()) {
+        if (auto result = eraser.checkPermission(); result.hasError()) {
             std::string& message = result.error().message;
-            env->ThrowNew(eraseExceptionClass, message.c_str());
-            return false;
+            env->ThrowNew(fileExceptionClass, message.c_str());
+            return -1LL;
         }
 
-        if (auto result = getEraser().overwriteFile(); result.hasError()) {
+        if (auto result = eraser.overwriteFile(); result.hasError()) {
             std::string& message = result.error().message;
-            env->ThrowNew(eraseExceptionClass, message.c_str());
-            return false;
+            env->ThrowNew(fileExceptionClass, message.c_str());
+            return -1LL;
         }
 
-        if (auto result = getEraser().truncateFile(0); result.hasError()) {
+        if (auto result = eraser.truncateFile(0); result.hasError()) {
             std::string& message = result.error().message;
-            env->ThrowNew(eraseExceptionClass, message.c_str());
-            return false;
+            env->ThrowNew(fileExceptionClass, message.c_str());
+            return -1LL;
         }
 
-        if (auto result = getEraser().removeFile(); result.hasError()) {
+        if (auto result = eraser.removeFile(); result.hasError()) {
             std::string& message = result.error().message;
-            env->ThrowNew(eraseExceptionClass, message.c_str());
-            return false;
+            env->ThrowNew(fileExceptionClass, message.c_str());
+            return -1LL;
         }
 
-        return true;
+        auto endTime = std::chrono::steady_clock::now();
+
+        return std::chrono::duration_cast<std::chrono::microseconds>(endTime - beginTime).count();
     }
 
-    jboolean nativeEraseFileWithDefaultMode(JNIEnv* rawEnv, jclass clazz, jstring jvmPath) {
+    jlong nativeEraseFileWithDefaultMode(JNIEnv* rawEnv, jclass clazz, jstring jvmPath) {
         auto env = makeNonNull(rawEnv);
         jobject simpleModeObject = env->GetStaticObjectField(overwriteModeClass, simpleModeFieldId);
 
         return nativeEraseFile(env, clazz, jvmPath, simpleModeObject);
     }
 
-    jboolean eraseFiles(JNIEnv* rawEnv, jclass clazz, jobject jvmOverwriteMode, jobjectArray jvmPaths) {
-        auto env = makeNonNull(rawEnv);
-        size_t length = env->GetArrayLength(jvmPaths);
-
-        for (size_t i = 0; i < length; i++) {
-            auto jvmPath = (jstring) env->GetObjectArrayElement(jvmPaths, i);
-
-            if (!nativeEraseFile(env, clazz, jvmPath, jvmOverwriteMode)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    jboolean nativeEraseFilesWithDefaultMode(JNIEnv* rawEnv, jclass clazz, jobjectArray jvmPaths) {
-        auto env = makeNonNull(rawEnv);
-        jobject simpleModeObject = env->GetStaticObjectField(overwriteModeClass, simpleModeFieldId);
-
-        return eraseFiles(env, clazz, simpleModeObject, jvmPaths);
-    }
-
-    jboolean nativeEraseDirectory(JNIEnv* rawEnv, jclass clazz, jstring jvmPath, jobject jvmOverwriteMode, jboolean isRecursive) {
+    jlong nativeEraseDirectory(JNIEnv* rawEnv, jclass clazz, jstring jvmPath, jobject jvmOverwriteMode, jboolean isRecursive) {
         auto env = makeNonNull(rawEnv);
         const auto jvmUniquePath = jni::UniqueUtfChars(env, jvmPath);
         const auto folder = std::filesystem::path(static_cast<const char*>(jvmUniquePath.get()));
+
         jstring filePath = nullptr;
+        auto beginTime = std::chrono::steady_clock::now();
 
         if (!std::filesystem::exists(folder)) {
-            env->ThrowNew(eraseExceptionClass, "Directory doesn't exist");
-            return false;
+            env->ThrowNew(fileExceptionClass, "Directory doesn't exist");
+            return -1LL;
         }
 
         if (!std::filesystem::is_directory(folder)) {
-            env->ThrowNew(eraseExceptionClass, "Path doesn't directory");
-            return false;
+            env->ThrowNew(fileExceptionClass, "Path doesn't directory");
+            return -1LL;
         }
 
         if (isRecursive) {
@@ -147,7 +124,7 @@ namespace kl::fs {
 
                 if (!std::filesystem::is_directory(item.path())) {
                     if (!nativeEraseFile(env, clazz, filePath, jvmOverwriteMode)) {
-                        return false;
+                        return -1LL;
                     }
                 }
             }
@@ -156,39 +133,39 @@ namespace kl::fs {
                 filePath = env->NewStringUTF(item.path().c_str());
 
                 if (!nativeEraseFile(env, clazz, filePath, jvmOverwriteMode)) {
-                    return false;
+                    return -1LL;
                 }
             }
         }
 
-        return true;
+        auto endTime = std::chrono::steady_clock::now();
+
+        return std::chrono::duration_cast<std::chrono::microseconds>(endTime - beginTime).count();
     }
 
-    jboolean nativeEraseDirectoryWithDefaultMode(JNIEnv* rawEnv, jclass clazz, jstring jvmPath, jboolean isRecursive) {
+    jlong nativeEraseDirectoryWithDefaultMode(JNIEnv* rawEnv, jclass clazz, jstring jvmPath, jboolean isRecursive) {
         auto env = makeNonNull(rawEnv);
         jobject simpleModeObject = env->GetStaticObjectField(overwriteModeClass, simpleModeFieldId);
 
         return nativeEraseDirectory(env, clazz, jvmPath, simpleModeObject, isRecursive);
     }
 
-    const std::array<JNINativeMethod, 6> JNI_METHODS = {{
-        {"eraseFile", "(Ljava/lang/String;)Z", (void*)nativeEraseFileWithDefaultMode},
-        {"eraseFile", "(Ljava/lang/String;Lorg/kl/firearrow/fs/OverwriteMode;)Z", (void*)nativeEraseFile},
-        {"eraseFiles", "([Ljava/lang/String;)Z", (void*)nativeEraseFilesWithDefaultMode},
-        {"eraseFiles", "(Lorg/kl/firearrow/fs/OverwriteMode;[Ljava/lang/String;)Z", (void*)eraseFiles},
-        {"eraseDirectory", "(Ljava/lang/String;Z)Z", (void*)nativeEraseDirectoryWithDefaultMode},
-        {"eraseDirectory", "(Ljava/lang/String;Lorg/kl/firearrow/fs/OverwriteMode;Z)Z", (void*)nativeEraseDirectory}
+    const std::array<JNINativeMethod, 4> JNI_METHODS = {{
+        {"eraseFile", "(Ljava/lang/String;)J", (void*)nativeEraseFileWithDefaultMode},
+        {"eraseFile", "(Ljava/lang/String;Lorg/kl/firearrow/fs/OverwriteMode;)J", (void*)nativeEraseFile},
+        {"eraseDirectory", "(Ljava/lang/String;Z)J", (void*)nativeEraseDirectoryWithDefaultMode},
+        {"eraseDirectory", "(Ljava/lang/String;Lorg/kl/firearrow/fs/OverwriteMode;Z)J", (void*)nativeEraseDirectory}
     }};
 }
 
-jint registerFilesystemManager(JNIEnv* rawEnv) {
+jint registerFileManager(JNIEnv* rawEnv) {
     using kl::fs::JNI_METHODS;
 
     auto env = makeNonNull(rawEnv);
     jclass temporaryClass;
 
-    temporaryClass = env->FindClass("org/kl/firearrow/fs/EraseException");
-    eraseExceptionClass = (jclass) env->NewGlobalRef(temporaryClass);
+    temporaryClass = env->FindClass("org/kl/firearrow/fs/FileException");
+    fileExceptionClass = (jclass) env->NewGlobalRef(temporaryClass);
 
     temporaryClass = env->FindClass("org/kl/firearrow/fs/OverwriteMode");
     overwriteModeClass = (jclass) env->NewGlobalRef(temporaryClass);
@@ -196,14 +173,14 @@ jint registerFilesystemManager(JNIEnv* rawEnv) {
     simpleModeFieldId = env->GetStaticFieldID(overwriteModeClass, "SIMPLE_MODE", "Lorg/kl/firearrow/fs/OverwriteMode;");
     nameMethodId = env->GetMethodID(overwriteModeClass, "name", "()Ljava/lang/String;");
 
-    jclass fsManagerClass = env->FindClass("org/kl/firearrow/fs/FileSystemManager");
-    return env->RegisterNatives(fsManagerClass, JNI_METHODS.data(), JNI_METHODS.size());
+    jclass fileManagerClass = env->FindClass("org/kl/firearrow/fs/FileManager");
+    return env->RegisterNatives(fileManagerClass, JNI_METHODS.data(), JNI_METHODS.size());
 }
 
-void unregisterFilesystemManager(JNIEnv* rawEnv) {
+void unregisterFileManager(JNIEnv* rawEnv) {
     auto env = makeNonNull(rawEnv);
 
     env->DeleteGlobalRef(overwriteModeClass);
-    env->DeleteGlobalRef(eraseExceptionClass);
+    env->DeleteGlobalRef(fileExceptionClass);
 }
 

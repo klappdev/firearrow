@@ -48,7 +48,7 @@ namespace kl::jni {
         return rawChars;
     }
 
-    size_t UniqueUtfChars::size() const {
+    std::size_t UniqueUtfChars::size() const {
         return std::strlen(rawChars);
     }
 }

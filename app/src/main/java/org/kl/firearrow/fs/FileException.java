@@ -23,11 +23,11 @@
  */
 package org.kl.firearrow.fs;
 
-public final class EraseException extends Exception {
+public final class FileException extends Exception {
     private static final long serialVersionUID = 1L;
     private final String message;
 
-    public EraseException(String message) {
+    public FileException(String message) {
         super();
         this.message = message;
     }

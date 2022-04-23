@@ -21,50 +21,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE  OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+#pragma once
 
-#include "FsUtil.hpp"
+#include <string>
+#include <memory>
 
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <cerrno>
+#include <util/error/Result.hpp>
+#include "FileError.hpp"
 
 namespace kl::fs {
+    using namespace kl::util::error;
 
-    void FileDeleter::operator()(FILE *fd)  {
-        if (fd != nullptr) {
-            ::fclose(fd);
-        }
-    }
+    struct FileDeleter final {
+        void operator()(FILE *fd);
+    };
 
-    Result<FileUniquePtr, FsError> makeOpenFile(const std::string& path, const std::string& mode) {
-        FILE *handle = ::fopen(path.c_str(), mode.c_str());
+    using FileUniquePtr = std::unique_ptr<FILE, FileDeleter>;
 
-        if (handle == nullptr) {
-            return FsError("Can't open file %s, error %s", path.c_str(), ::strerror(errno));
-        }
+    Result<FileUniquePtr, FileError> makeOpenFile(const std::string& path, const std::string& mode);
 
-        return FileUniquePtr(handle);
-    }
-
-    Result<std::size_t, FsError> blockSize(const std::string& path) {
-        struct stat fileInfo = {};
-
-        if (::lstat(path.c_str(), &fileInfo) == -1) {
-            return FsError("Can't get file %s status , error %s", path.c_str(), ::strerror(errno));
-        }
-
-        std::size_t size = fileInfo.st_blksize;
-
-        return size > 16 ? size : 512;
-    }
-
-    Result<std::uint32_t, FsError> countHardLinks(const std::string& path) {
-        struct stat fileInfo = {};
-
-        if (::lstat(path.c_str(), &fileInfo) < 0) {
-            return FsError("Can't get file %s status, error %s", path.c_str(), ::strerror(errno));
-        }
-
-        return static_cast<std::uint32_t>(fileInfo.st_nlink);
-    }
+    Result<std::size_t, FileError> blockSize(const std::string& path);
+    Result<std::uint32_t, FileError> countHardLinks(const std::string& path);
 }
+
+
+

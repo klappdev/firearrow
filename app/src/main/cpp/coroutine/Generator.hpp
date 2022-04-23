@@ -21,24 +21,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE  OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.kl.firearrow.model;
 
-import lombok.EqualsAndHashCode;
+#pragma once
 
-public abstract class Result<T, E> {
+namespace kl::coroutine {
 
-    protected Result() {}
-
-    @lombok.Value
-    @EqualsAndHashCode(callSuper = true)
-    public class Value extends Result<T, E> {
-        private T value;
-        private long time;
-    }
-
-    @lombok.Value
-    @EqualsAndHashCode(callSuper = true)
-    public class Error extends Result<T, E> {
-        private E error;
-    }
+    template<typename T>
+    class Generator final {
+    public:
+        /*Implement in future*/
+    };
 }

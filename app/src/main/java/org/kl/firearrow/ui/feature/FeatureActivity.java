@@ -23,7 +23,6 @@
  */
 package org.kl.firearrow.ui.feature;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
@@ -38,13 +37,10 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable;
 
 import org.kl.firearrow.R;
 import org.kl.firearrow.databinding.ActivityFeatureBinding;
-import org.kl.firearrow.event.feature.FeatureMapper;
 import org.kl.firearrow.viewmodel.FeatureListViewModel;
 
 @AndroidEntryPoint
 public class FeatureActivity extends AppCompatActivity {
-    @Inject
-    public FeatureMapper featureMapper;
 
     @Inject
     public CompositeDisposable disposables;
@@ -79,7 +75,7 @@ public class FeatureActivity extends AppCompatActivity {
         this.consoleTextEdit = binding.consoleEditText;
         this.featureRecyclerView = binding.featureRecyclerView;
 
-        this.featureAdapter = new FeatureAdapter(featureMapper);
+        this.featureAdapter = new FeatureAdapter();
         featureRecyclerView.setAdapter(featureAdapter);
     }
 

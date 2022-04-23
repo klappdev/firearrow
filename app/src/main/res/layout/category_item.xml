@@ -9,7 +9,7 @@
 	<data>
 		<variable
 			name="category"
-			type="org.kl.firearrow.model.Category" />
+			type="org.kl.firearrow.db.entity.Category" />
 	</data>
 
 	<androidx.cardview.widget.CardView

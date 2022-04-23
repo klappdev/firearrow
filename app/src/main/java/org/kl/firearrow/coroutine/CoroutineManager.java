@@ -21,19 +21,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE  OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.kl.firearrow.fs;
+package org.kl.firearrow.coroutine;
 
-public final class FileSystemManager {
+import java.util.concurrent.Callable;
 
-    public static native boolean eraseFile(String path) throws EraseException;
+public final class CoroutineManager {
 
-    public static native boolean eraseFile(String path, OverwriteMode mode) throws EraseException;
+    private CoroutineManager() throws IllegalAccessException {
+        throw new IllegalAccessException("Can't create instance");
+    }
 
-    public static native boolean eraseFiles(String... paths) throws EraseException;
+    public static native Task<Void> await(Runnable runnable) throws CoroutineException;
+    public static native <T> Task<T> await(Callable<T> caller) throws CoroutineException;
 
-    public static native boolean eraseFiles(OverwriteMode mode, String... paths) throws EraseException;
-
-    public static native boolean eraseDirectory(String path, boolean recursive) throws EraseException;
-
-    public static native boolean eraseDirectory(String path, OverwriteMode mode, boolean recursive) throws EraseException;
+    public static native <T extends Number> Generator<T> yield(T initValue, int count) throws CoroutineException;
+    public static native <T extends Number> Generator<T> yield(T initValue, int begin, int end) throws CoroutineException;
 }
