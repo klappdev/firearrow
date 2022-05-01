@@ -33,7 +33,7 @@ namespace kl::test {
         SPRING, SUMMER, AUTUMN, WINTER
     };
 
-    static inline constexpr Enumeration<Season, 4> seasons = {
+    static inline constexpr Enumeration<Season, 4> SEASONS = {
         {Season::SPRING, "Spring"},
         {Season::SUMMER, "Summer"},
         {Season::AUTUMN, "Autumn"},
@@ -41,19 +41,19 @@ namespace kl::test {
     };
 
     TEST(EnumerationTest, createEnumerationTest) {
-        EXPECT_EQ(seasons.count(), 4);
-        EXPECT_EQ(seasons.ordinal(Season::SPRING), 0);
+        EXPECT_EQ(SEASONS.count(), 4);
+        EXPECT_EQ(SEASONS.ordinal(Season::SPRING), 0);
     }
 
     TEST(EnumerationTest, compareEnumerationNamesTest) {
         constexpr std::array<const char*, 4> names = {"Spring", "Summer", "Autumn", "Winter"};
-        EXPECT_STREQ(seasons.name(Season::SUMMER), "Summer");
-        EXPECT_EQ(seasons.names(), names);
+        EXPECT_STREQ(SEASONS.name(Season::SUMMER), "Summer");
+        EXPECT_EQ(SEASONS.names(), names);
     }
 
     TEST(EnumerationTest, compareEnumerationValuesTest) {
         constexpr std::array<Season, 4> values = {Season::SPRING, Season::SUMMER, Season::AUTUMN, Season::WINTER};
-        EXPECT_EQ(seasons.value("Winter"), Season::WINTER);
-        EXPECT_EQ(seasons.values(), values);
+        EXPECT_EQ(*SEASONS.value("Winter"), Season::WINTER);
+        EXPECT_EQ(SEASONS.values(), values);
     }
 }

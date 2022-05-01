@@ -7,7 +7,7 @@
     <string name="console_title">Console output</string>
     <string name="empty_features">List features are empty</string>
 
-    <string name="start_console_text">Start executing Java/C++ feature operations</string>
+    <string name="start_console_text">===== Start executing Java/C++ feature operations =====</string>
     <string name="title_activity_settings">SettingsActivity</string>
 
     <string name="language_header">Language</string>

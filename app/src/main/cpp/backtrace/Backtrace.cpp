@@ -40,15 +40,15 @@ namespace kl::backtrace {
     }
 
     bool Backtrace::empty() const noexcept { return countFrames == 0; }
-    size_t Backtrace::size() const noexcept { return countFrames; }
-    size_t Backtrace::maxSize() const noexcept { return maxCountFrames; }
+    std::size_t Backtrace::size() const noexcept { return countFrames; }
+    std::size_t Backtrace::maxSize() const noexcept { return maxCountFrames; }
 
-    const BacktraceFrame& Backtrace::operator[](size_t index) const {
-        if (0 < index || index > frames.size()) {
-            //FIXME: jniThrowArrayIndexOutOfBoundsException();
+    std::optional<std::reference_wrapper<const BacktraceFrame>> Backtrace::operator[](std::size_t index) const {
+        if (index > frames.size()) {
+            return std::nullopt;
         }
 
-        return frames[index];
+        return std::cref(frames[index]);
     }
 
     Backtrace::Iterator Backtrace::begin() const noexcept { return frames.begin(); }
@@ -81,7 +81,7 @@ namespace kl::backtrace {
         }
     }
 
-    Backtrace Backtrace::current(size_t skip, size_t maxDepth) {
+    Backtrace Backtrace::current(std::size_t skip, std::size_t maxDepth) {
         Backtrace backtrace;
         BacktraceState state = {
             .framesSize = 0, .framesSkip = skip, .framesDepth = maxDepth
@@ -135,10 +135,9 @@ namespace kl::backtrace {
     }
 
     bool Backtrace::isSharedLibrary(const char *name) {
-        if (name != nullptr) {
-            return util::strings::contains(name, ".so");
-        }
-        return false;
+        if (name == nullptr) return false;
+
+        return util::strings::contains(name, ".so");
     }
 
     std::string toString(const Backtrace& backtrace) {

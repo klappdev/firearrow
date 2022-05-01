@@ -42,8 +42,12 @@ public final class FeatureAdapter extends PagingDataAdapter<Feature, FeatureView
     @Setter
     private int position = -1;
 
-    public FeatureAdapter() {
+    private final FeatureActivity activity;
+
+    public FeatureAdapter(FeatureActivity activity) {
         super(new FeatureDifferenceCallback());
+
+        this.activity = activity;
     }
 
     @NonNull
@@ -62,7 +66,7 @@ public final class FeatureAdapter extends PagingDataAdapter<Feature, FeatureView
 
         if (feature != null) {
             holder.bind(feature);
-            holder.getBindingRoot().setOnClickListener(new ChooseFeatureListener(feature.getId()));
+            holder.getBindingRoot().setOnClickListener(new ChooseFeatureListener(feature.getId(), activity));
         }
     }
 

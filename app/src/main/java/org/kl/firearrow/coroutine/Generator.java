@@ -34,7 +34,7 @@ public final class Generator<E extends Number> implements Iterable<E> {
     @Getter
     private final long duration;
 
-    public Generator(Object[] array, long duration) {
+    public Generator(E[] array, long duration) {
         this.array = array;
         this.duration = duration;
     }

@@ -25,6 +25,7 @@
 #include "FileEraser.hpp"
 
 #include <string>
+#include <inttypes.h>
 
 #include "FileUnit.hpp"
 #include <logging/Logging.hpp>
@@ -227,7 +228,7 @@ namespace kl::fs {
         std::memset(buffer.get(), byte, bufferSize);
 #if 0
         for (std::size_t i = 0; i < bufferSize; ++i) {
-            log::info(TAG, "buffer[%d] = %d", i, uint32_t(buffer[i]));
+            log::info(TAG, "buffer[%d] = %d", i, std::uint32_t(buffer[i]));
         }
 #endif
         if (auto result = makeOpenFile(fileName, "r+b"); result.hasValue()) {
@@ -246,7 +247,7 @@ namespace kl::fs {
         maskBuffer(mask);
 #if 0
         for (std::size_t i = 0; i < bufferSize; ++i) {
-            log::info(TAG, "buffer[%d] = %d", i, uint32_t(buffer[i]));
+            log::info(TAG, "buffer[%d] = %d", i, std::uint32_t(buffer[i]));
         }
 #endif
         if (auto result = makeOpenFile(fileName, "r+b"); result.hasValue()) {
@@ -267,7 +268,7 @@ namespace kl::fs {
         std::copy(randomData.begin(), randomData.end(), buffer.get());
 #if 0
         for (std::size_t i = 0; i < bufferSize; ++i) {
-            log::info(TAG, "buffer[%d] = %d", i, uint32_t(buffer[i]));
+            log::info(TAG, "buffer[%d] = %d", i, std::uint32_t(buffer[i]));
         }
 #endif
         if (auto result = makeOpenFile(fileName, "r+b"); result.hasValue()) {
@@ -288,7 +289,7 @@ namespace kl::fs {
         std::size_t written = 0;
         std::string errorMessage;
 
-        log::debug(TAG, "Overwrite [buffer size=%d, file size=%lu, count=%zu, tail=%zu, pass=%d]",
+        log::debug(TAG, "Overwrite [buffer size=%d, file size=%" PRId64 ", count=%zu, tail=%zu, pass=%d]",
                    bufferSize, fileSize, count, tail, pass);
 
         if (::fseek(file.get(), 0, SEEK_SET) != 0) {
@@ -359,7 +360,7 @@ namespace kl::fs {
             return FileError(errorMessage);
         }
 
-        log::debug(TAG, "File written %lu with size %lu", written, fileSize);
+        log::debug(TAG, "File written %zu with size %" PRId64, written, fileSize);
 
         return written;
     }

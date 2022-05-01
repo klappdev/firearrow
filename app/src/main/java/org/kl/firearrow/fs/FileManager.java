@@ -36,4 +36,47 @@ public final class FileManager {
     public static native long eraseDirectory(String path, boolean recursive) throws FileException;
 
     public static native long eraseDirectory(String path, OverwriteMode mode, boolean recursive) throws FileException;
+
+    public static String cppEraseFile(OverwriteMode mode) {
+        final String tmpFile = "/path/file.txt";
+
+        final var builder = new StringBuilder();
+        final long beginTime = System.currentTimeMillis();
+
+        builder.append("Start native erasing ").append(tmpFile).append("\n");
+
+        try {
+            final long duration = FileManager.eraseFile(tmpFile, mode);
+
+            builder.append("> C++ execution time: ").append(duration).append(" ms\n");
+        } catch (FileException e) {
+            builder.append("> Erase file ").append(tmpFile).append(" exception")
+                   .append(e.getMessage()).append("\n");
+        }
+
+        final long endTime = System.currentTimeMillis();
+        builder.append("> JNI execution time: ").append(endTime - beginTime).append(" ms\n");
+
+        return builder.toString();
+    }
+
+    public static String javaDeleteFile() {
+        return "Not implemented yet\n";
+    }
+
+    public static String javaDeleteDirectory() {
+        return "Not implemented yet\n";
+    }
+
+    public static String cppEraseDirectory() {
+        return "Not implemented yet\n";
+    }
+
+    public static String javaEraseDirectoryRecursive() {
+        return "Not implemented yet\n";
+    }
+
+    public static String cppEraseDirectoryRecursive() {
+        return "Not implemented yet\n";
+    }
 }

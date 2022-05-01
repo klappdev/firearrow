@@ -24,12 +24,13 @@
 
 #include <chrono>
 #include <array>
-#include <jni.h>
 
+#include <jni.h>
 #include <util/nullability/NonNull.hpp>
 #include <util/nullability/Nullable.hpp>
 
 #include "Task.hpp"
+#include "Generator.hpp"
 #include "FuturePromise.hpp"
 
 namespace {
@@ -39,8 +40,13 @@ namespace {
     jclass callableClass = nullptr;
     jclass runnableClass = nullptr;
 
+    jclass integerClass = nullptr;
+
     jmethodID generatorConstructorId = nullptr;
     jmethodID taskConstructorId = nullptr;
+    jmethodID integerConstructorId = nullptr;
+
+    jmethodID intValueMethodId = nullptr;
 
     jmethodID callMethodId = nullptr;
     jmethodID runMethodId = nullptr;
@@ -51,56 +57,85 @@ using namespace kl::util::nullability;
 namespace kl::coroutine {
 
     template<typename T>
-    std::future<Task<T>> invokeTask(std::function<T()> callback) {
+    std::future<Task<T>> executeTask(std::function<T()> callback) {
         Task<T> task(std::move(callback));
-
         co_await task;
         co_return task;
+    }
+
+    //FIXME: using concept std::integral
+    template<typename T, typename = std::enable_if_t<std::is_integral_v<T>>>
+    Generator<T> executeGenerator(T init_value, int begin, int end) {
+        for (int i = begin; i < end; i++) {
+            co_yield (init_value + i);
+        }
     }
 
     jobject nativeAwaitRunnable(JNIEnv* rawEnv, jclass clazz, jobject jvmRunnable) {
         auto env = makeNonNull(rawEnv);
         auto beginTime = std::chrono::steady_clock::now();
 
-        Task<void> task = invokeTask<void>(
-            [&]() {
-                //FIXME: maybe use UniqueJniEnv
-                env->CallVoidMethod(jvmRunnable, runMethodId);
-            }).get();
+        std::future<Task<void>> future = executeTask<void>(
+                [&]() {  env->CallVoidMethod(jvmRunnable, runMethodId); });
+        Task<void> task = future.get();
 
         auto endTime = std::chrono::steady_clock::now();
 
         return env->NewObject(taskClass, taskConstructorId,
               nullptr, task.finished ? JNI_TRUE : JNI_FALSE,
-              std::chrono::duration_cast<std::chrono::microseconds>(endTime - beginTime).count());
+              std::chrono::duration_cast<std::chrono::milliseconds>(endTime - beginTime).count());
     }
 
     jobject nativeAwaitCallable(JNIEnv* rawEnv, jclass clazz, jobject jvmCallable) {
         auto env = makeNonNull(rawEnv);
         auto beginTime = std::chrono::steady_clock::now();
 
-        Task<Nullable<jobject>> task = invokeTask<Nullable<jobject>>(
-            [&]() {
-                //FIXME: maybe use UniqueJniEnv
-                return env->CallObjectMethod(jvmCallable, callMethodId);
-            }).get();
+        std::future<Task<Nullable<jobject>>> future = executeTask<Nullable<jobject>>(
+                [&]() { return env->CallObjectMethod(jvmCallable, callMethodId); });
+        Task<Nullable<jobject>> task = future.get();
 
         auto endTime = std::chrono::steady_clock::now();
 
         return env->NewObject(taskClass, taskConstructorId,
-              task.value.get(), task.finished ? JNI_TRUE : JNI_FALSE,
-              std::chrono::duration_cast<std::chrono::microseconds>(endTime - beginTime).count());
-    }
-
-    jobject nativeYield(JNIEnv* rawEnv, jclass clazz, jobject jvmInitValue, jint jvmCount) {
-        return nullptr;
+                task.value.get(), task.finished ? JNI_TRUE : JNI_FALSE,
+                std::chrono::duration_cast<std::chrono::milliseconds>(endTime - beginTime).count());
     }
 
     jobject nativeYieldInRange(JNIEnv* rawEnv, jclass clazz, jobject jvmInitValue, jint jvmBegin, jint jvmEnd) {
-        return nullptr;
+        auto env = makeNonNull(rawEnv);
+        auto beginTime = std::chrono::steady_clock::now();
+
+        if (!env->IsInstanceOf(jvmInitValue, integerClass)) {
+            env->ThrowNew(coroutineExceptionClass, "Generator could work only with integer initial value");
+            return nullptr;
+        }
+
+        jint initValue = env->CallIntMethod(jvmInitValue, intValueMethodId);
+        jobjectArray jvmNumbers = env->NewObjectArray(jvmEnd - jvmBegin, integerClass, nullptr);
+
+        auto generator = executeGenerator(initValue, jvmBegin, jvmEnd);
+
+        for (std::int32_t i = 0; std::int32_t number : generator) {
+            jobject jvmNumber = env->NewObject(integerClass, integerConstructorId, number);
+            env->SetObjectArrayElement(jvmNumbers, i++, jvmNumber);
+        }
+
+        if (generator.hasError()) {
+            env->ThrowNew(coroutineExceptionClass, "Generator take native coroutine error");
+            return nullptr;
+        }
+
+        auto endTime = std::chrono::steady_clock::now();
+
+        return env->NewObject(generatorClass, generatorConstructorId, jvmNumbers,
+                  std::chrono::duration_cast<std::chrono::milliseconds>(endTime - beginTime).count());
     }
 
-    const std::array<JNINativeMethod, 4> JNI_METHODS = {{
+    jobject nativeYield(JNIEnv* rawEnv, jclass clazz, jobject jvmInitValue, jint jvmCount) {
+        return nativeYieldInRange(rawEnv, clazz, jvmInitValue, 0, jvmCount);
+    }
+
+    constexpr std::array<JNINativeMethod, 4> JNI_METHODS = {{
         {"await", "(Ljava/lang/Runnable;)Lorg/kl/firearrow/coroutine/Task;", (void*)nativeAwaitRunnable},
         {"await", "(Ljava/util/concurrent/Callable;)Lorg/kl/firearrow/coroutine/Task;", (void*)nativeAwaitCallable},
         {"yield", "(Ljava/lang/Number;I)Lorg/kl/firearrow/coroutine/Generator;", (void*)nativeYield},
@@ -129,8 +164,14 @@ jint registerCoroutineManager(JNIEnv* rawEnv) {
     temporaryClass = env->FindClass("org/kl/firearrow/coroutine/Task");
     taskClass = (jclass) env->NewGlobalRef(temporaryClass);
 
-    generatorConstructorId = env->GetMethodID(generatorClass, "<init>", "([Ljava/lang/Object;J)V");
+    temporaryClass = env->FindClass("java/lang/Integer");
+    integerClass = (jclass) env->NewGlobalRef(temporaryClass);
+
+    generatorConstructorId = env->GetMethodID(generatorClass, "<init>", "([Ljava/lang/Number;J)V");
     taskConstructorId = env->GetMethodID(taskClass, "<init>", "(Ljava/lang/Object;ZJ)V");
+    integerConstructorId = env->GetMethodID(integerClass, "<init>", "(I)V");
+
+    intValueMethodId = env->GetMethodID(integerClass, "intValue", "()I");
 
     callMethodId = env->GetMethodID(callableClass, "call", "()Ljava/lang/Object;");
     runMethodId = env->GetMethodID(runnableClass, "run", "()V");
@@ -144,6 +185,9 @@ void unregisterCoroutineManager(JNIEnv* rawEnv) {
 
     env->DeleteGlobalRef(coroutineExceptionClass);
     env->DeleteGlobalRef(callableClass);
+    env->DeleteGlobalRef(runnableClass);
+
+    env->DeleteGlobalRef(integerClass);
 
     env->DeleteGlobalRef(generatorClass);
     env->DeleteGlobalRef(taskClass);

@@ -31,13 +31,15 @@ namespace kl::util::error {
     class [[nodiscard]] Result {
     public:
         constexpr Result() = default;
-        constexpr Result(const Result&) = default;
-        constexpr Result(Result&&) noexcept = default;
-        constexpr Result(V&& value) : data(std::forward<V>(value)) {}
-        constexpr Result(E&& error) : data(std::forward<E>(error)) {}
         ~Result() = default;
 
+        constexpr Result(V value) : data(std::move(value)) {}
+        constexpr Result(E error) : data(std::move(error)) {}
+
+        constexpr Result(const Result&) = default;
         constexpr Result& operator=(const Result&) = default;
+
+        constexpr Result(Result&&) noexcept = default;
         constexpr Result& operator=(Result&&) = default;
 
         constexpr Result& operator=(const V& value) {
@@ -45,18 +47,8 @@ namespace kl::util::error {
             return *this;
         }
 
-        constexpr Result& operator=(V&& value) {
-            data = std::forward<V>(value);
-            return *this;
-        }
-
         constexpr Result& operator=(const E& error) {
             data = error;
-            return *this;
-        }
-
-        constexpr Result& operator=(E&& error) {
-            data = std::forward<V>(error);
             return *this;
         }
 

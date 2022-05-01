@@ -58,7 +58,14 @@ namespace kl::fs {
 
         auto beginTime = std::chrono::steady_clock::now();
 
-        if (auto result = eraser.init(filePath, overwriteMode.value(jvmModeName.get())); result.hasError()) {
+        auto overwriteMode = OVERWRITE_MODE.value(jvmModeName.get());
+
+        if (!overwriteMode.has_value()) {
+            env->ThrowNew(fileExceptionClass, "Set unknown OverwriteMode");
+            return -1LL;
+        }
+
+        if (auto result = eraser.init(filePath, *overwriteMode); result.hasError()) {
             std::string& message = result.error().message;
             env->ThrowNew(fileExceptionClass, message.c_str());
             return -1LL;
@@ -150,7 +157,7 @@ namespace kl::fs {
         return nativeEraseDirectory(env, clazz, jvmPath, simpleModeObject, isRecursive);
     }
 
-    const std::array<JNINativeMethod, 4> JNI_METHODS = {{
+    constexpr std::array<JNINativeMethod, 4> JNI_METHODS = {{
         {"eraseFile", "(Ljava/lang/String;)J", (void*)nativeEraseFileWithDefaultMode},
         {"eraseFile", "(Ljava/lang/String;Lorg/kl/firearrow/fs/OverwriteMode;)J", (void*)nativeEraseFile},
         {"eraseDirectory", "(Ljava/lang/String;Z)J", (void*)nativeEraseDirectoryWithDefaultMode},

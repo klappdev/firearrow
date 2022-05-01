@@ -7,7 +7,7 @@
     <string name="console_title">Konsolenausgabe</string>
     <string name="empty_features">Listenfunktionen sind leer</string>
 
-    <string name="start_console_text">Beginnen Sie mit der Ausführung von Java/C++-Funktionsoperationen</string>
+    <string name="start_console_text">===== Beginnen Sie mit der Ausführung von Java/C++-Funktionsoperationen =====</string>
     <string name="title_activity_settings">EinstellungenAktivität</string>
 
     <string name="language_header">Sprache</string>

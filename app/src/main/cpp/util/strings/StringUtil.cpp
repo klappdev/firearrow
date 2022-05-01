@@ -29,17 +29,17 @@
 
 namespace kl::util::strings {
 
-    std::string randomBuffer(std::size_t length) {
-        const std::string characters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    static constexpr char CHARACTERS[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
+    std::string randomBuffer(std::size_t length) {
         std::random_device randomDevice;
         std::mt19937 generator(randomDevice());
-        std::uniform_int_distribution<> distribution(0, characters.size() - 1);
+        std::uniform_int_distribution<> distribution(0, std::ssize(CHARACTERS) - 1);
 
         std::string result;
 
         for (std::size_t i = 0; i < length; ++i) {
-            result += characters[distribution(generator)];
+            result += CHARACTERS[distribution(generator)];
         }
 
         return result;

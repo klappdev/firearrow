@@ -58,12 +58,12 @@
   {
     "id": 12,
     "idCategory" : 2,
-    "name" : "C++: Execute operation using coroutine with callbacks"
+    "name" : "C++: Execute operation using coroutine"
   },
   {
     "id": 13,
     "idCategory" : 2,
-    "name" : "Java: Execute operation using coroutine"
+    "name" : "Java: Execute operation using thread with result"
   },
   {
     "id": 14,

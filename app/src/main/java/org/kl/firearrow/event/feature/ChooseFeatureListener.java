@@ -27,41 +27,59 @@ import static org.kl.firearrow.util.ContextUtils.*;
 
 import android.view.View;
 
-import org.kl.firearrow.fs.FileException;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
+
+import org.kl.firearrow.coroutine.CoroutineManager;
 import org.kl.firearrow.fs.FileManager;
 import org.kl.firearrow.fs.OverwriteMode;
+import org.kl.firearrow.ui.feature.FeatureActivity;
 
 public final class ChooseFeatureListener implements View.OnClickListener {
     private final long featureId;
+    private final FeatureActivity activity;
 
-    public ChooseFeatureListener(long featureId) {
+    public ChooseFeatureListener(long featureId, FeatureActivity activity) {
         this.featureId = featureId;
+        this.activity = activity;
     }
 
     @Override
     public void onClick(View view) {
+        activity.getDisposables().add(Observable.fromCallable(this::executeFeature)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe((String result) -> {
+                activity.showExecutionFeature(result);
+
+                toast(view.getContext(), "Finished operation !!!");
+            }));
+    }
+
+    private String executeFeature() {
         final String result;
 
         switch ((int) featureId) {
-            case 1: result = javaDeleteFile(); break;
-            case 2: result = cppEraseFile(OverwriteMode.SIMPLE_MODE); break;
-            case 3: result = cppEraseFile(OverwriteMode.DOE_MODE); break;
-            case 4: result = cppEraseFile(OverwriteMode.OPENBSD_MODE); break;
-            case 5: result = cppEraseFile(OverwriteMode.RCMP_MODE); break;
-            case 6: result = cppEraseFile(OverwriteMode.DOD_MODE); break;
-            case 7: result = javaDeleteDirectory(); break;
-            case 8: result = cppEraseDirectory(); break;
-            case 9: result = javaEraseDirectoryRecursive(); break;
-            case 10: result = cppEraseDirectoryRecursive(); break;
+            case 1: result = FileManager.javaDeleteFile(); break;
+            case 2: result = FileManager.cppEraseFile(OverwriteMode.SIMPLE_MODE); break;
+            case 3: result = FileManager.cppEraseFile(OverwriteMode.DOE_MODE); break;
+            case 4: result = FileManager.cppEraseFile(OverwriteMode.OPENBSD_MODE); break;
+            case 5: result = FileManager.cppEraseFile(OverwriteMode.RCMP_MODE); break;
+            case 6: result = FileManager.cppEraseFile(OverwriteMode.DOD_MODE); break;
+            case 7: result = FileManager.javaDeleteDirectory(); break;
+            case 8: result = FileManager.cppEraseDirectory(); break;
+            case 9: result = FileManager.javaEraseDirectoryRecursive(); break;
+            case 10: result = FileManager.cppEraseDirectoryRecursive(); break;
 
-            case 11: result = javaThreadOperation(); break;
-            case 12: result = cppCoroutineAwaitableOperation(); break;
-            case 13: result = cppCoroutineRunnableOperation(); break;
-            case 14: result = cppCoroutineCallableOperation(); break;
-            case 15: result = javaStreamGenerateNumbers(); break;
-            case 16: result = cppGeneratorYieldNumbers(); break;
-            case 17: result = javaStreamGenerateSequence(); break;
-            case 18: result = cppGeneratorYieldSequence(); break;
+            case 11: result = CoroutineManager.javaThreadRunnableOperation(); break;
+            case 12: result = CoroutineManager.cppCoroutineRunnableOperation(); break;
+            case 13: result = CoroutineManager.javaThreadCallableOperation(); break;
+            case 14: result = CoroutineManager.cppCoroutineCallableOperation(); break;
+            case 15: result = CoroutineManager.javaStreamGenerateNumbers(); break;
+            case 16: result = CoroutineManager.cppGeneratorYieldNumbers(); break;
+            case 17: result = CoroutineManager.javaStreamGenerateSequence(); break;
+            case 18: result = CoroutineManager.cppGeneratorYieldSequence(); break;
 
             case 19: result = javaSummaryTwoArrayNumbers(); break;
             case 20: result = cppSummaryTwoArrayNumbers(); break;
@@ -70,86 +88,22 @@ public final class ChooseFeatureListener implements View.OnClickListener {
             default: result = "Unknown operation!!!"; break;
         }
 
-        toast(view.getContext(), "Finished operation " + result);
-    }
-
-    private String javaDeleteFile() {
-        return "Not implemented yet";
-    }
-
-    private String cppEraseFile(OverwriteMode mode) {
-        final String tmpFile = "/path/file.txt";
-
-        try {
-            final long duration = FileManager.eraseFile(tmpFile, mode);
-
-            return "Erase file " + tmpFile + "successfully with duration => " + duration + " ms";
-        } catch (FileException e) {
-            return "Erase file " + tmpFile + "with exception" + e.getMessage();
-        }
-    }
-
-    private String javaDeleteDirectory() {
-        return "Not implemented yet";
-    }
-
-    private String cppEraseDirectory() {
-        return "Not implemented yet";
-    }
-
-    private String javaEraseDirectoryRecursive() {
-        return "Not implemented yet";
-    }
-
-    private String cppEraseDirectoryRecursive() {
-        return "Not implemented yet";
-    }
-
-    private String javaThreadOperation() {
-        return "Not implemented yet";
-    }
-
-    private String cppCoroutineAwaitableOperation() {
-        return "Not implemented yet";
-    }
-
-    private String cppCoroutineRunnableOperation() {
-        return "Not implemented yet";
-    }
-
-    private String cppCoroutineCallableOperation() {
-        return "Not implemented yet";
-    }
-
-    private String javaStreamGenerateNumbers() {
-        return "Not implemented yet";
-    }
-
-    private String cppGeneratorYieldNumbers() {
-        return "Not implemented yet";
-    }
-
-    private String javaStreamGenerateSequence() {
-        return "Not implemented yet";
-    }
-
-    private String cppGeneratorYieldSequence() {
-        return "Not implemented yet";
+        return result;
     }
 
     private String javaSummaryTwoArrayNumbers() {
-        return "Not implemented yet";
+        return "Not implemented yet\n";
     }
 
     private String cppSummaryTwoArrayNumbers() {
-        return "Not implemented yet";
+        return "Not implemented yet\n";
     }
 
     private String javaStreamSummaryTwoArrayNumbers() {
-        return "Not implemented yet";
+        return "Not implemented yet\n";
     }
 
     private String cppSimdSummaryTwoArrayNumbers() {
-        return "Not implemented yet";
+        return "Not implemented yet\n";
     }
 }

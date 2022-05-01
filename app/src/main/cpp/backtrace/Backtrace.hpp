@@ -25,6 +25,7 @@
 
 #include <string>
 #include <vector>
+#include <optional>
 
 #include "BacktraceFrame.hpp"
 #include "BacktraceState.hpp"
@@ -44,13 +45,13 @@ namespace kl::backtrace {
         Backtrace& operator=(const Backtrace&) = default;
         Backtrace& operator=(Backtrace&&) noexcept = default;
 
-        static Backtrace current(size_t skip = BACKTRACE_SKIP_FRAMES, size_t maxDepth = BACKTRACE_MAX_FRAMES);
+        static Backtrace current(std::size_t skip = BACKTRACE_SKIP_FRAMES, std::size_t maxDepth = BACKTRACE_MAX_FRAMES);
 
         [[nodiscard]] bool empty() const noexcept;
-        size_t size() const noexcept;
-        size_t maxSize() const noexcept;
+        std::size_t size() const noexcept;
+        std::size_t maxSize() const noexcept;
 
-        const BacktraceFrame& operator[](size_t index) const;
+        std::optional<std::reference_wrapper<const BacktraceFrame>> operator[](std::size_t index) const;
 
         Iterator begin() const noexcept;
         Iterator end() const noexcept;
@@ -62,8 +63,8 @@ namespace kl::backtrace {
         bool isSharedLibrary(const char* name);
 
     private:
-        size_t countFrames;
-        size_t maxCountFrames;
+        std::size_t countFrames;
+        std::size_t maxCountFrames;
         std::vector<BacktraceFrame> frames;
     };
 

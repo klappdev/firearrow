@@ -6,13 +6,17 @@ The purpose of the application is to test, compare and measure time execution</b
  Java/C++ simialar functionalities.
 
 ![List of features](screenshot/firearrow_1.jpg "A list of features")
-![Filesystem feature](screenshot/firearrow_2.jpg "A erase filesystem feature")
+![Filesystem feature](screenshot/firearrow_2.jpg "A erase file feature")
+![Async feature](screenshot/firearrow_3.jpg "A asynchronously feature")
+![Simd feature](screenshot/firearrow_4.jpg "A simd feature")
+![Network feature](screenshot/firearrow_5.jpg "A network feature")
 
 Features:
 ---------
   * filesystem - compare Java vs C++ erase file facilities
   * async      - compare Java vs C++ asynchronously facilities
   * simd       - compare Java vs C++ vector instruction facilities
+  * network    - compare Java vs C++ network facilities
 
 Architecture:
 -------------

@@ -24,7 +24,8 @@
 #pragma once
 
 #include <array>
-#include <cstring>
+#include <string>
+#include <optional>
 
 #include <util/arrays/ArrayUtils.hpp>
 
@@ -64,14 +65,14 @@ namespace kl::util::enumeration {
             return result;
         }
 
-        constexpr E value(const char* name) const {
+        constexpr std::optional<E> value(const char* name) const {
             for (const auto& [key, value] : data) {
                 if (std::strcmp(value, name) == 0) {
                     return key;
                 }
             }
 
-            return {};
+            return std::nullopt;
         }
 
         constexpr std::array<E, N> values() const {

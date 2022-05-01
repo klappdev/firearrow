@@ -49,7 +49,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* jvm, [[maybe_unused]] void*
     registerJniExceptions(env);
 
     if (registerFileManager(env) != 0) {
-        kl::log::error(TAG, "Could not register filesystem manager");
+        kl::log::error(TAG, "Could not register file manager");
         return JNI_ERR;
     }
 
