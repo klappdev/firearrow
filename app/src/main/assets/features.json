@@ -12,102 +12,92 @@
   {
     "id": 3,
     "idCategory" : 1,
-    "name" : "C++: Erase file with Doe mode"
+    "name" : "C++: Erase file with Openbsd mode"
   },
   {
     "id": 4,
     "idCategory" : 1,
-    "name" : "C++: Erase file with Openbsd mode"
+    "name" : "C++: Erase file with Dod mode"
   },
   {
     "id": 5,
     "idCategory" : 1,
-    "name" : "C++: Erase file with Rcmp mode"
+    "name" : "Java: Delete directory"
   },
   {
     "id": 6,
     "idCategory" : 1,
-    "name" : "C++: Erase file with Dod mode"
+    "name" : "C++: Erase directory"
   },
   {
     "id": 7,
     "idCategory" : 1,
-    "name" : "Java: Delete directory"
-  },
-  {
-    "id": 8,
-    "idCategory" : 1,
-    "name" : "C++: Erase directory"
-  },
-  {
-    "id": 9,
-    "idCategory" : 1,
     "name" : "Java: Delete directory recursive"
   },
   {
-    "id": 10,
+    "id": 8,
     "idCategory" : 1,
     "name" : "C++: Erase directory recursive"
   },
 
   {
-    "id": 11,
+    "id": 9,
     "idCategory" : 2,
     "name" : "Java: Execute operation using thread"
   },
   {
-    "id": 12,
+    "id": 10,
     "idCategory" : 2,
     "name" : "C++: Execute operation using coroutine"
   },
   {
-    "id": 13,
+    "id": 11,
     "idCategory" : 2,
     "name" : "Java: Execute operation using thread with result"
   },
   {
-    "id": 14,
+    "id": 12,
     "idCategory" : 2,
     "name" : "C++: Execute operation using coroutine with result"
   },
   {
-    "id": 15,
+    "id": 13,
     "idCategory" : 2,
     "name" : "Java: Generate numbers using stream api"
   },
   {
-    "id": 16,
+    "id": 14,
     "idCategory" : 2,
     "name" : "C++: Generate numbers using generator"
   },
   {
-    "id": 17,
+    "id": 15,
     "idCategory" : 2,
     "name" : "Java: Generate numbers in sequence using stream api"
   },
   {
-    "id": 18,
+    "id": 16,
     "idCategory" : 2,
     "name" : "C++: Generate numbers in sequence using generator"
   },
 
   {
-    "id": 19,
+    "id": 17,
     "idCategory" : 3,
     "name" : "Java: Calculate summary two sequence numbers"
   },
   {
-    "id": 20,
+    "id": 18,
     "idCategory" : 3,
     "name" : "C++:  Calculate summary two sequence numbers"
   },
   {
-    "id": 21,
+    "id": 19,
     "idCategory" : 3,
     "name" : "Java: Calculate summary two sequence numbers using stream api"
   },
   {
-    "id": 22,
+    "id": 20,
     "idCategory" : 3,
     "name" : "C++: Calculate summary two sequence numbers using simd api"
   }

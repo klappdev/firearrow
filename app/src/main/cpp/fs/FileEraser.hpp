@@ -55,11 +55,8 @@ namespace kl::fs {
         void showPermission(std::filesystem::perms permission);
 
         Result<std::size_t, FileError> overwriteByte(int pass, std::uint8_t symbol);
-        Result<std::size_t, FileError> overwriteBytes(int pass, const std::string& mask);
         Result<std::size_t, FileError> overwriteRandom(int pass);
         Result<std::size_t, FileError> overwriteBuffer(int pass);
-
-        std::size_t maskBuffer(const std::string& mask);
         Result<std::size_t, FileError> writeBuffer(std::size_t count, std::size_t tail);
 
     private:

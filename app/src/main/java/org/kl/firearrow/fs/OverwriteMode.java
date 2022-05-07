@@ -27,9 +27,7 @@ import lombok.Getter;
 
 public enum OverwriteMode {
     SIMPLE_MODE(1),
-    DOE_MODE(3),
     OPENBSD_MODE(3),
-    RCMP_MODE(3),
     DOD_MODE(7);
 
     @Getter

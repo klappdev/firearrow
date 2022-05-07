@@ -97,7 +97,7 @@ namespace kl::fs {
 
         auto endTime = std::chrono::steady_clock::now();
 
-        return std::chrono::duration_cast<std::chrono::microseconds>(endTime - beginTime).count();
+        return std::chrono::duration_cast<std::chrono::milliseconds>(endTime - beginTime).count();
     }
 
     jlong nativeEraseFileWithDefaultMode(JNIEnv* rawEnv, jclass clazz, jstring jvmPath) {
@@ -147,7 +147,7 @@ namespace kl::fs {
 
         auto endTime = std::chrono::steady_clock::now();
 
-        return std::chrono::duration_cast<std::chrono::microseconds>(endTime - beginTime).count();
+        return std::chrono::duration_cast<std::chrono::milliseconds>(endTime - beginTime).count();
     }
 
     jlong nativeEraseDirectoryWithDefaultMode(JNIEnv* rawEnv, jclass clazz, jstring jvmPath, jboolean isRecursive) {

@@ -25,7 +25,7 @@
 #include "FileEraser.hpp"
 
 #include <string>
-#include <inttypes.h>
+#include <cinttypes>
 
 #include "FileUnit.hpp"
 #include <logging/Logging.hpp>
@@ -160,17 +160,6 @@ namespace kl::fs {
         switch (eraseEntry.mode) {
         case OverwriteMode::SIMPLE_MODE:
             return overwriteByte(1, 0x00);
-        case OverwriteMode::DOE_MODE:
-            if (auto result = overwriteRandom(1); result.hasError()) {
-                return static_cast<FileError>(result.error());
-            }
-            if (auto result = overwriteRandom(2); result.hasError()) {
-                return static_cast<FileError>(result.error());
-            }
-            if (auto result = overwriteBytes(3, "DoE"); result.hasError()) {
-                return static_cast<FileError>(result.error());
-            }
-            break;
         case OverwriteMode::OPENBSD_MODE:
             if (auto result = overwriteByte(1, 0xFF); result.hasError()) {
                 return static_cast<FileError>(result.error());
@@ -179,17 +168,6 @@ namespace kl::fs {
                 return static_cast<FileError>(result.error());
             }
             if (auto result = overwriteByte(3, 0xFF); result.hasError()) {
-                return static_cast<FileError>(result.error());
-            }
-            break;
-        case OverwriteMode::RCMP_MODE:
-            if (auto result = overwriteByte(1, 0x00); result.hasError()) {
-                return static_cast<FileError>(result.error());
-            }
-            if (auto result = overwriteByte(2, 0xFF); result.hasError()) {
-                return static_cast<FileError>(result.error());
-            }
-            if (auto result = overwriteBytes(3, "RCMP"); result.hasError()) {
                 return static_cast<FileError>(result.error());
             }
             break;
@@ -226,25 +204,6 @@ namespace kl::fs {
 
         this->buffer = std::make_unique<uint8_t[]>(bufferSize);
         std::memset(buffer.get(), byte, bufferSize);
-#if 0
-        for (std::size_t i = 0; i < bufferSize; ++i) {
-            log::info(TAG, "buffer[%d] = %d", i, std::uint32_t(buffer[i]));
-        }
-#endif
-        if (auto result = makeOpenFile(fileName, "r+b"); result.hasValue()) {
-            this->file = std::move(result.value());
-        } else {
-            return static_cast<FileError>(result.error());
-        }
-
-        return overwriteBuffer(pass);
-    }
-
-    Result<std::size_t, FileError> FileEraser::overwriteBytes(int pass, const std::string& mask) {
-        const auto& [fileName, fileSize, bufferSize, mode] = eraseEntry;
-
-        buffer = std::make_unique<uint8_t[]>(bufferSize);
-        maskBuffer(mask);
 #if 0
         for (std::size_t i = 0; i < bufferSize; ++i) {
             log::info(TAG, "buffer[%d] = %d", i, std::uint32_t(buffer[i]));
@@ -321,18 +280,6 @@ namespace kl::fs {
         file.reset();
 
         return written;
-    }
-
-    std::size_t FileEraser::maskBuffer(const std::string& mask) {
-        for (size_t j = 0, i = eraseEntry.bufferSize - 1; i >= 0; i--) {
-            buffer[i] = mask[j];
-
-            if (++j == mask.size()) {
-                j = 0;
-            }
-        }
-
-        return mask.size();
     }
 
     Result<std::size_t, FileError> FileEraser::writeBuffer(std::size_t count, std::size_t tail) {

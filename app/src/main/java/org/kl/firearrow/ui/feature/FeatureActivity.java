@@ -37,7 +37,6 @@ import dagger.hilt.android.AndroidEntryPoint;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import lombok.Getter;
 
-import org.kl.firearrow.R;
 import org.kl.firearrow.databinding.ActivityFeatureBinding;
 import org.kl.firearrow.viewmodel.FeatureListViewModel;
 
@@ -91,7 +90,5 @@ public class FeatureActivity extends AppCompatActivity {
             .subscribe(data -> {
                 featureAdapter.submitData(getLifecycle(), data);
             }));
-
-        consoleTextEdit.setText(R.string.start_console_text);
     }
 }

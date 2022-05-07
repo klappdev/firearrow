@@ -48,7 +48,7 @@ public final class CoroutineManager {
         final long beginTime = System.currentTimeMillis();
         final var builder = new StringBuilder();
 
-        builder.append("\nStart Java thread sort array numbers ").append("\n");
+        builder.append("\nStart Java thread sort array numbers\n");
 
         try {
             final String[] result = new String[1];
@@ -83,7 +83,7 @@ public final class CoroutineManager {
         final long beginTime = System.currentTimeMillis();
         final var builder = new StringBuilder();
 
-        builder.append("\nStart C++ coroutine sort array numbers ").append("\n");
+        builder.append("\nStart C++ coroutine sort array numbers\n");
 
         try {
             final String[] result = new String[1];
@@ -180,7 +180,6 @@ public final class CoroutineManager {
         builder.append("> JNI execution time: ").append(endTime - beginTime).append(" ms\n");
 
         return builder.toString();
-
     }
 
     public static String javaStreamGenerateNumbers() {

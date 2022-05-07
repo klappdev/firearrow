@@ -1,15 +1,16 @@
 # firearrow
 
+[![Apk file](https://img.shields.io/github/downloads/genuinetools/apk-file/total.svg?style=for-the-badge)](files/app-debug.apk)
+
 Android application for test and measure Java/C++ features.
 
 The purpose of the application is to test, compare and measure time execution</br> 
  Java/C++ simialar functionalities.
 
-![List of features](screenshot/firearrow_1.jpg "A list of features")
-![Filesystem feature](screenshot/firearrow_2.jpg "A erase file feature")
-![Async feature](screenshot/firearrow_3.jpg "A asynchronously feature")
-![Simd feature](screenshot/firearrow_4.jpg "A simd feature")
-![Network feature](screenshot/firearrow_5.jpg "A network feature")
+![List of features](files/firearrow_1.jpg "A list of features")
+![Filesystem feature](files/firearrow_2.jpg "A erase file feature")
+![Async feature](files/firearrow_3.jpg "A asynchronously feature")
+![Simd feature](files/firearrow_4.jpg "A simd feature")
 
 Features:
 ---------

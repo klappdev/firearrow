@@ -36,7 +36,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
 
-        android:text="@string/console_title"
+        android:text="@string/start_console_text"
         android:textColor="?attr/colorPrimary"
         android:textSize="16sp"
         android:textStyle="bold"
@@ -50,12 +50,12 @@
         android:ems="15"
 
         android:clickable="false"
-        android:cursorVisible="false"
-        android:focusable="false"
+        android:cursorVisible="true"
+        android:focusable="true"
         android:focusableInTouchMode="false"
         android:background="@color/white"
 
-        android:gravity="top|start"
+        android:gravity="bottom"
         android:inputType="textMultiLine"
         android:scrollbars="vertical"
         android:lines="10"
@@ -90,14 +90,14 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginEnd="@dimen/activity_horizontal_margin"
-            android:text="Run all" />
+            android:text="@string/run_all_title" />
 
         <Button
             android:id="@+id/clear_all_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Clear all" />
+            android:text="@string/clear_all_title" />
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView

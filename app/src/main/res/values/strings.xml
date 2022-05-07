@@ -7,7 +7,7 @@
     <string name="console_title">Console output</string>
     <string name="empty_features">List features are empty</string>
 
-    <string name="start_console_text">===== Start executing Java/C++ feature operations =====</string>
+    <string name="start_console_text">Start executing Java/C++ features</string>
     <string name="title_activity_settings">SettingsActivity</string>
 
     <string name="language_header">Language</string>
@@ -15,4 +15,6 @@
     <string name="language_title">Change languages</string>
     <string name="theme_title">Change theme light/night</string>
     <string name="settings_title">SettingsActivity</string>
+    <string name="run_all_title">Run all</string>
+    <string name="clear_all_title">Clear all</string>
 </resources>
