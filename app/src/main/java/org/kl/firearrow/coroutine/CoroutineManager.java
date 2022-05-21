@@ -23,6 +23,8 @@
  */
 package org.kl.firearrow.coroutine;
 
+import androidx.annotation.NonNull;
+
 import java.util.Arrays;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -38,8 +40,8 @@ public final class CoroutineManager {
         throw new IllegalAccessException("Can't create instance");
     }
 
-    public static native Task<Void> await(Runnable runnable) throws CoroutineException;
-    public static native <T> Task<T> await(Callable<T> caller) throws CoroutineException;
+    public static native Task<Void> await(@NonNull Runnable runnable) throws CoroutineException;
+    public static native <T> Task<T> await(@NonNull Callable<T> caller) throws CoroutineException;
 
     public static native <T extends Number> Generator<T> yield(T initValue, int count) throws CoroutineException;
     public static native <T extends Number> Generator<T> yield(T initValue, int begin, int end) throws CoroutineException;

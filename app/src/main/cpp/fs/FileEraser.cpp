@@ -44,7 +44,7 @@ namespace kl::fs {
         return eraser;
     }
 
-    Result<std::size_t, FileError> FileEraser::init(const std::filesystem::path& newPath, OverwriteMode newMode) {
+    Result<void, FileError> FileEraser::init(const std::filesystem::path& newPath, OverwriteMode newMode) {
         this->path = newPath;
 
         std::string errorMessage;
@@ -80,10 +80,10 @@ namespace kl::fs {
         eraseEntry.fileSize = std::filesystem::file_size(path);
         eraseEntry.mode = newMode;
 
-        return 0;
+        return {};
     }
 
-    Result<std::size_t, FileError> FileEraser::checkPermission() {
+    Result<void, FileError> FileEraser::checkPermission() {
         std::filesystem::perms permission = std::filesystem::status(path).permissions();
         showPermission(permission);
 
@@ -96,7 +96,7 @@ namespace kl::fs {
             return FileError(errorCode.message());
         }
 
-        return 0;
+        return {};
     }
 
     void FileEraser::showPermission(std::filesystem::perms permission) {
@@ -116,7 +116,7 @@ namespace kl::fs {
               ((permission & std::filesystem::perms::others_exec) != std::filesystem::perms::none ? "x" : "-"));
     }
 
-    Result<std::size_t, FileError> FileEraser::removeFile() {
+    Result<void, FileError> FileEraser::removeFile() {
         std::string parentPath = path.parent_path();
         std::string fileName = path.filename();
         std::filesystem::path copyPath = path;
@@ -139,10 +139,10 @@ namespace kl::fs {
 
         log::debug(TAG, "Remove file: %s", fileName.c_str());
 
-        return 0;
+        return {};
     }
 
-    Result<std::size_t, FileError> FileEraser::truncateFile(std::size_t size) {
+    Result<void, FileError> FileEraser::truncateFile(std::size_t size) {
         std::error_code errorCode = {};
 
         std::filesystem::resize_file(path, size, errorCode);
@@ -153,13 +153,16 @@ namespace kl::fs {
 
         log::debug(TAG, "Truncate file: %s", eraseEntry.fileName.c_str());
 
-        return 0;
+        return {};
     }
 
-    Result<std::size_t, FileError> FileEraser::overwriteFile() {
+    Result<void, FileError> FileEraser::overwriteFile() {
         switch (eraseEntry.mode) {
         case OverwriteMode::SIMPLE_MODE:
-            return overwriteByte(1, 0x00);
+            if (auto result = overwriteByte(1, 0x00); result.hasError()) {
+                return static_cast<FileError>(result.error());
+            }
+            break;
         case OverwriteMode::OPENBSD_MODE:
             if (auto result = overwriteByte(1, 0xFF); result.hasError()) {
                 return static_cast<FileError>(result.error());
@@ -196,7 +199,7 @@ namespace kl::fs {
             break;
         }
 
-        return 0;
+        return {};
     }
 
     Result<std::size_t, FileError> FileEraser::overwriteByte(int pass, std::uint8_t byte) {
@@ -247,10 +250,10 @@ namespace kl::fs {
 
         std::size_t written = 0;
         std::string errorMessage;
-
+#if 0
         log::debug(TAG, "Overwrite [buffer size=%d, file size=%" PRId64 ", count=%zu, tail=%zu, pass=%d]",
                    bufferSize, fileSize, count, tail, pass);
-
+#endif
         if (::fseek(file.get(), 0, SEEK_SET) != 0) {
             errorMessage = "Fail seek in file";
             log::error(TAG, errorMessage);

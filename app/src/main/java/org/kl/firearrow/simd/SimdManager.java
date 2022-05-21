@@ -23,25 +23,43 @@
  */
 package org.kl.firearrow.simd;
 
+import java.util.BitSet;
+
 public final class SimdManager {
+
+    private static final int[] ARRAY1 = {
+        11, 22, 33, 44, 55, 66, 77, 88, 99, 88, 77, 66, 55, 44, 33, 22, 11
+    };
+
+    private static final int[] ARRAY2 = {
+        22, 33, 44, 55, 66, 77, 88, 99, 11, 99, 88, 77, 66, 55, 44, 33, 22
+    };
 
     private SimdManager() throws IllegalAccessException {
         throw new IllegalAccessException("Can't create instance");
     }
 
-    public static String javaSummaryTwoArrayNumbers() {
+    public static native boolean isSupported(SimdAbi abi);
+
+    public static native <T extends Number> SimdResult<T> sumArrays(T[] left, T[] right);
+
+    public static native <T extends Number> SimdResult<T> sumArrays(T[] left, T[] right, SimdAbi abi);
+
+    public static native <T extends Number> SimdResult<T> sumArrays(T[] left, T[] right, BitSet mask, SimdAbi abi);
+
+    public static String javaAddTwoArrayNumbers() {
         return "Not implemented yet\n";
     }
 
-    public static String cppSummaryTwoArrayNumbers() {
+    public static String cppAddTwoArrayNumbers() {
         return "Not implemented yet\n";
     }
 
-    public static String javaStreamSummaryTwoArrayNumbers() {
+    public static String javaStreamAddTwoArrayNumbers() {
         return "Not implemented yet\n";
     }
 
-    public static String cppSimdSummaryTwoArrayNumbers() {
+    public static String cppSimdAddTwoArrayNumbers() {
         return "Not implemented yet\n";
     }
 }

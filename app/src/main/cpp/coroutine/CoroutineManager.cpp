@@ -39,7 +39,6 @@ namespace {
     jclass coroutineExceptionClass = nullptr;
     jclass callableClass = nullptr;
     jclass runnableClass = nullptr;
-
     jclass integerClass = nullptr;
 
     jmethodID generatorConstructorId = nullptr;
@@ -47,7 +46,6 @@ namespace {
     jmethodID integerConstructorId = nullptr;
 
     jmethodID intValueMethodId = nullptr;
-
     jmethodID callMethodId = nullptr;
     jmethodID runMethodId = nullptr;
 }
@@ -63,7 +61,7 @@ namespace kl::coroutine {
         co_return task;
     }
 
-    //FIXME: using concept std::integral
+    /*FIXME: using concept std::integral*/
     template<typename T, typename = std::enable_if_t<std::is_integral_v<T>>>
     Generator<T> executeGenerator(T init_value, int begin, int end) {
         for (int i = begin; i < end; i++) {
@@ -145,11 +143,9 @@ namespace kl::coroutine {
 
 jint registerCoroutineManager(JNIEnv* rawEnv) {
     using kl::coroutine::JNI_METHODS;
-
     auto env = makeNonNull(rawEnv);
-    jclass temporaryClass;
 
-    temporaryClass = env->FindClass("org/kl/firearrow/coroutine/CoroutineException");
+    jclass temporaryClass = env->FindClass("org/kl/firearrow/coroutine/CoroutineException");
     coroutineExceptionClass = (jclass) env->NewGlobalRef(temporaryClass);
 
     temporaryClass = env->FindClass("java/util/concurrent/Callable");

@@ -24,7 +24,6 @@
 package org.kl.firearrow.fs;
 
 import android.content.Context;
-
 import androidx.annotation.NonNull;
 
 import java.io.File;
@@ -41,13 +40,13 @@ public final class FileManager {
         throw new IllegalAccessException("Can't create instance");
     }
 
-    public static native long eraseFile(String path) throws FileException;
+    public static native long eraseFile(@NonNull String path) throws FileException;
 
-    public static native long eraseFile(String path, OverwriteMode mode) throws FileException;
+    public static native long eraseFile(@NonNull String path, OverwriteMode mode) throws FileException;
 
-    public static native long eraseDirectory(String path, boolean recursive) throws FileException;
+    public static native long eraseDirectory(@NonNull String path, boolean recursive) throws FileException;
 
-    public static native long eraseDirectory(String path, OverwriteMode mode, boolean recursive) throws FileException;
+    public static native long eraseDirectory(@NonNull String path, OverwriteMode mode, boolean recursive) throws FileException;
 
     public static String javaDeleteFile(@NonNull Context context) {
         final var builder = new StringBuilder();

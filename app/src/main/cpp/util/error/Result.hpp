@@ -73,16 +73,54 @@ namespace kl::util::error {
         constexpr E&& error() && { return std::move(std::get<E>(data)); }
         constexpr const E&& error() const&& { return std::move(std::get<E>(data)); }
 
+        template<typename V2, typename E2>
+        friend constexpr bool operator==(const Result& left, const Result<V2, E2>& right) {
+            if (left.hasValue() != right.hasValue()) return false;
+            if (!left.hasValue()) return left.error() == right.error();
+            return *left == *right;
+        }
+
     private:
         std::variant<V, E> data;
     };
 
-    template<typename V1, typename E1, typename V2, typename E2>
-    constexpr bool operator==(const Result<V1, E1>& left, const Result<V2, E2>& right) {
-        if (left.hasValue() != right.hasValue()) return false;
-        if (!left.hasValue()) return left.error() == right.error();
-        return *left == *right;
-    }
+    template<typename V, typename E>
+        requires std::is_void_v<V>
+    class [[nodiscard]] Result<V, E> {
+    public:
+        constexpr Result() = default;
+        ~Result() = default;
+
+        constexpr Result(E error) : data(std::move(error)) {}
+
+        constexpr Result(const Result&) = default;
+        constexpr Result& operator=(const Result&) = default;
+
+        constexpr Result(Result&&) noexcept = default;
+        constexpr Result& operator=(Result&&) = default;
+
+        constexpr Result& operator=(const E& error) {
+            data = error;
+            return *this;
+        }
+
+        constexpr bool hasError() const { return data.index() == 1; }
+
+        constexpr E& error() & { return std::get<E>(data); }
+        constexpr const E& error() const& { return std::get<E>(data); }
+        constexpr E&& error() && { return std::move(std::get<E>(data)); }
+        constexpr const E&& error() const&& { return std::move(std::get<E>(data)); }
+
+        template<typename V2, typename E2> requires std::is_void_v<V2>
+        friend constexpr bool operator==(const Result& left, const Result<V2, E2>& right) {
+            if (left.hasError()) return left.error() == right.error();
+            return false;
+        }
+
+    private:
+        struct Empty {};
+        std::variant<Empty, E> data;
+    };
 }
 
 

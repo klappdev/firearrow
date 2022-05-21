@@ -21,49 +21,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE  OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#pragma once
+package org.kl.firearrow.simd;
 
-#include <filesystem>
-#include <memory>
+import lombok.Value;
 
-#include "EraseEntry.hpp"
-#include "OverwriteMode.hpp"
-#include "FileUtil.hpp"
-#include "FileError.hpp"
-
-#include <util/error/Result.hpp>
-
-namespace kl::fs {
-    using namespace kl::util::error;
-
-    class FileEraser final {
-    private:
-        FileEraser() = default;
-        ~FileEraser() = default;
-
-    public:
-        static FileEraser& instance();
-
-        Result<void, FileError> init(const std::filesystem::path& path, OverwriteMode newMode);
-
-        Result<void, FileError> checkPermission();
-        Result<void, FileError> removeFile();
-        Result<void, FileError> overwriteFile();
-        Result<void, FileError> truncateFile(std::size_t size);
-
-    private:
-        void showPermission(std::filesystem::perms permission);
-
-        Result<std::size_t, FileError> overwriteByte(int pass, std::uint8_t symbol);
-        Result<std::size_t, FileError> overwriteRandom(int pass);
-        Result<std::size_t, FileError> overwriteBuffer(int pass);
-        Result<std::size_t, FileError> writeBuffer(std::size_t count, std::size_t tail);
-
-    private:
-        std::unique_ptr<std::uint8_t[]> buffer;
-        EraseEntry eraseEntry;
-
-        std::filesystem::path path;
-        FileUniquePtr file;
-    };
+@Value
+public final class SimdResult<E extends Number> {
+    private E[] value;
+    private boolean isAbiSupported;
+    private long duration;
 }

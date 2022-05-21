@@ -6,13 +6,12 @@ include_directories(.)
 
 set(CMAKE_CXX_STANDARD 20)
 
-# coroutines support
+# coroutines & simd support
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcoroutines-ts -Wall")
 
 # include source files
 add_library(firearrow SHARED
         core/LoadLibrary.cpp
-
         coroutine/CoroutineManager.cpp
 
         backtrace/BacktraceFrame.cpp
@@ -21,6 +20,8 @@ add_library(firearrow SHARED
         fs/FileManager.cpp
         fs/FileEraser.cpp
         fs/FileUtil.cpp
+
+        simd/SimdManager.cpp
 
         jni/UniqueUtfChars.cpp
         jni/UniqueJniEnv.cpp

@@ -22,7 +22,6 @@
  * SOFTWARE.
  */
 
-#include <filesystem>
 #include <chrono>
 #include <array>
 #include <jni.h>
@@ -167,11 +166,9 @@ namespace kl::fs {
 
 jint registerFileManager(JNIEnv* rawEnv) {
     using kl::fs::JNI_METHODS;
-
     auto env = makeNonNull(rawEnv);
-    jclass temporaryClass;
 
-    temporaryClass = env->FindClass("org/kl/firearrow/fs/FileException");
+    jclass temporaryClass = env->FindClass("org/kl/firearrow/fs/FileException");
     fileExceptionClass = (jclass) env->NewGlobalRef(temporaryClass);
 
     temporaryClass = env->FindClass("org/kl/firearrow/fs/OverwriteMode");

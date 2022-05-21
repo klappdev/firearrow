@@ -84,10 +84,10 @@ public final class ChooseFeatureListener implements View.OnClickListener {
             case 15: result = CoroutineManager.javaStreamGenerateSequence(); break;
             case 16: result = CoroutineManager.cppGeneratorYieldSequence(); break;
 
-            case 17: result = SimdManager.javaSummaryTwoArrayNumbers(); break;
-            case 18: result = SimdManager.cppSummaryTwoArrayNumbers(); break;
-            case 19: result = SimdManager.javaStreamSummaryTwoArrayNumbers(); break;
-            case 20: result = SimdManager.cppSimdSummaryTwoArrayNumbers(); break;
+            case 17: result = SimdManager.javaAddTwoArrayNumbers(); break;
+            case 18: result = SimdManager.cppAddTwoArrayNumbers(); break;
+            case 19: result = SimdManager.javaStreamAddTwoArrayNumbers(); break;
+            case 20: result = SimdManager.cppSimdAddTwoArrayNumbers(); break;
             default: result = "Unknown operation!!!"; break;
         }
 

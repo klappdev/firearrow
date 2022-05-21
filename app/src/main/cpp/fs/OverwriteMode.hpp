@@ -27,7 +27,7 @@
 
 namespace kl::fs {
 
-    enum class OverwriteMode {
+    enum class OverwriteMode : std::uint8_t {
         SIMPLE_MODE  = 1,
         OPENBSD_MODE = 3,
         DOD_MODE     = 7
