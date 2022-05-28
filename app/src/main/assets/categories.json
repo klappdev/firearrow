@@ -16,5 +16,11 @@
     "name": "Simd",
     "description": "Compare measure simd operations in Java/C++",
     "iconUrl": "feature_icon"
+  },
+  {
+    "id": 4,
+    "name": "Network",
+    "description": "Compare measure network operations in Java/C++",
+    "iconUrl": "feature_icon"
   }
 ]

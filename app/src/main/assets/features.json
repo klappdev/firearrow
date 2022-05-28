@@ -89,7 +89,7 @@
   {
     "id": 18,
     "idCategory" : 3,
-    "name" : "C++:  Calculate summary two sequence numbers"
+    "name" : "C++: Calculate summary two sequence numbers"
   },
   {
     "id": 19,
@@ -100,5 +100,26 @@
     "id": 20,
     "idCategory" : 3,
     "name" : "C++: Calculate summary two sequence numbers using simd api"
+  },
+
+  {
+    "id": 21,
+    "idCategory" : 4,
+    "name" : "Java: Perform network GET request"
+  },
+  {
+    "id": 22,
+    "idCategory" : 4,
+    "name" : "C++: Perform network GET request"
+  },
+  {
+    "id": 23,
+    "idCategory" : 4,
+    "name" : "Java: Perform async network GET request"
+  },
+  {
+    "id": 24,
+    "idCategory" : 4,
+    "name" : "C++: Perform async network GET request"
   }
 ]

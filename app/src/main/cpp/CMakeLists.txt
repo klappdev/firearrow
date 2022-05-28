@@ -6,7 +6,7 @@ include_directories(.)
 
 set(CMAKE_CXX_STANDARD 20)
 
-# coroutines & simd support
+# coroutines support
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcoroutines-ts -Wall")
 
 # include source files
@@ -22,6 +22,8 @@ add_library(firearrow SHARED
         fs/FileUtil.cpp
 
         simd/SimdManager.cpp
+        net/NetworkManager.cpp
+        net/Socket.cpp
 
         jni/UniqueUtfChars.cpp
         jni/UniqueJniEnv.cpp

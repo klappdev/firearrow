@@ -24,7 +24,6 @@
 
 #include <chrono>
 #include <array>
-#include <jni.h>
 
 #include "FileEraser.hpp"
 #include "OverwriteMode.hpp"
@@ -49,11 +48,11 @@ namespace kl::fs {
         auto env = makeNonNull(rawEnv);
         auto& eraser = FileEraser::instance();
 
-        const auto jvmUniquePath = jni::UniqueUtfChars(env, jvmPath);
-        const auto filePath = std::filesystem::path(static_cast<const char*>(jvmUniquePath.get()));
+        jni::UniqueUtfChars jvmUniquePath(env, jvmPath);
+        std::filesystem::path filePath(static_cast<const char*>(jvmUniquePath.get()));
 
-        const auto modeName = (jstring) env->CallObjectMethod(jvmOverwriteMode, nameMethodId);
-        const auto jvmModeName = jni::UniqueUtfChars(env, modeName);
+        auto modeName = (jstring) env->CallObjectMethod(jvmOverwriteMode, nameMethodId);
+        jni::UniqueUtfChars jvmModeName(env, modeName);
 
         auto beginTime = std::chrono::steady_clock::now();
 

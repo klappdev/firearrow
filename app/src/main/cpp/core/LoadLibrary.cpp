@@ -35,6 +35,8 @@ extern int registerCoroutineManager(JNIEnv*);
 extern void unregisterCoroutineManager(JNIEnv*);
 extern int registerSimdManager(JNIEnv*);
 extern void unregisterSimdManager(JNIEnv*);
+extern int registerNetworkManager(JNIEnv*);
+extern void unregisterNetworkManager(JNIEnv*);
 
 static constexpr jint JNI_DEFAULT_VERSION = JNI_VERSION_1_6;
 static constexpr const char* const TAG = "LoadLibrary-JNI";
@@ -65,6 +67,11 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* jvm, [[maybe_unused]] void*
         return JNI_ERR;
     }
 
+    if (registerNetworkManager(env) != 0) {
+        kl::log::error(TAG, "Could not register network manager");
+        return JNI_ERR;
+    }
+
     kl::log::info(TAG, "Load jni library");
 
     return JNI_DEFAULT_VERSION;
@@ -82,6 +89,7 @@ extern "C" JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *jvm, [[maybe_unused]] voi
     unregisterFileManager(env);
     unregisterCoroutineManager(env);
     unregisterSimdManager(env);
+    unregisterNetworkManager(env);
 
     kl::log::info(TAG, "Unload jni library");
 }

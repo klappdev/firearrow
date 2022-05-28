@@ -23,7 +23,6 @@
  */
 
 #include <vector>
-#include <jni.h>
 #include <experimental/simd>
 
 #include "SimdAbi.hpp"
@@ -33,6 +32,8 @@
 
 namespace {
     jclass simdResultClass = nullptr;
+    jclass simdAbiClass = nullptr;
+
     jclass integerClass = nullptr;
     jclass integerArrayClass = nullptr;
     jclass illegalArgumentExceptionClass = nullptr;
@@ -110,7 +111,7 @@ namespace kl::simd {
     }
 
     jboolean nativeIsSupported(JNIEnv* rawEnv, jclass clazz, jobject jvmSimdAbi) {
-        /*FIXME: make in future*/
+        /*FIXME: implement in future*/
         return JNI_FALSE;
     }
 
@@ -195,7 +196,7 @@ namespace kl::simd {
 
     jobject nativeSumSimdMaskArrays(JNIEnv* rawEnv, jclass clazz, jobjectArray jvmLeftArray,
                                     jobjectArray jvmRightArray, jobject jvmMask, jobject jvmSimdAbi) {
-        /*FIXME: make in future*/
+        /*FIXME: implement in future*/
         return nullptr;
     }
 
@@ -220,19 +221,22 @@ jint registerSimdManager(JNIEnv* rawEnv) {
     jclass temporaryClass = env->FindClass("java/lang/Integer");
     integerClass = (jclass) env->NewGlobalRef(temporaryClass);
 
-    temporaryClass = env->FindClass("[java/lang/Integer");
+    temporaryClass = env->FindClass("[Ljava/lang/Integer;");
     integerArrayClass = (jclass) env->NewGlobalRef(temporaryClass);
 
-    temporaryClass = env->FindClass("[java/lang/IllegalArgumentException");
+    temporaryClass = env->FindClass("java/lang/IllegalArgumentException");
     illegalArgumentExceptionClass = (jclass) env->NewGlobalRef(temporaryClass);
 
     temporaryClass = env->FindClass("org/kl/firearrow/simd/SimdResult");
     simdResultClass = (jclass) env->NewGlobalRef(temporaryClass);
 
+    temporaryClass = env->FindClass("org/kl/firearrow/simd/SimdAbi");
+    simdAbiClass = (jclass) env->NewGlobalRef(temporaryClass);
+
     simdResultConstructorId = env->GetMethodID(simdResultClass, "<init>", "([Ljava/lang/Number;ZJ)V");
     integerConstructorId = env->GetMethodID(integerClass, "<init>", "(I)V");
 
-    getCountBytesMethodId = env->GetMethodID(integerClass, "getCountBytes", "()I");
+    getCountBytesMethodId = env->GetMethodID(simdAbiClass, "getCountBytes", "()I");
     intValueMethodId = env->GetMethodID(integerClass, "intValue", "()I");
 
     jclass simdManagerClass = env->FindClass("org/kl/firearrow/simd/SimdManager");
@@ -243,6 +247,7 @@ void unregisterSimdManager(JNIEnv* rawEnv) {
     auto env = makeNonNull(rawEnv);
 
     env->DeleteGlobalRef(simdResultClass);
+    env->DeleteGlobalRef(simdAbiClass);
     env->DeleteGlobalRef(integerClass);
     env->DeleteGlobalRef(integerArrayClass);
 }

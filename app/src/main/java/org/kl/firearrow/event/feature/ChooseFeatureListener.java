@@ -37,6 +37,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 import org.kl.firearrow.coroutine.CoroutineManager;
 import org.kl.firearrow.fs.FileManager;
 import org.kl.firearrow.fs.OverwriteMode;
+import org.kl.firearrow.net.NetworkManager;
 import org.kl.firearrow.simd.SimdManager;
 import org.kl.firearrow.ui.feature.FeatureActivity;
 
@@ -56,7 +57,6 @@ public final class ChooseFeatureListener implements View.OnClickListener {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe((String result) -> {
                 activity.showExecutionFeature(result);
-
                 toast(view.getContext(), "Finished operation !!!");
             }));
     }
@@ -88,6 +88,11 @@ public final class ChooseFeatureListener implements View.OnClickListener {
             case 18: result = SimdManager.cppAddTwoArrayNumbers(); break;
             case 19: result = SimdManager.javaStreamAddTwoArrayNumbers(); break;
             case 20: result = SimdManager.cppSimdAddTwoArrayNumbers(); break;
+
+            case 21: result = NetworkManager.javaPerformGETRequest(); break;
+            case 22: result = NetworkManager.cppPerformGETRequest(); break;
+            case 23: result = NetworkManager.javaPerformAsyncGETRequest(); break;
+            case 24: result = NetworkManager.cppPerformAsyncGETRequest(); break;
             default: result = "Unknown operation!!!"; break;
         }
 

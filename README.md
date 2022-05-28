@@ -9,8 +9,6 @@ The purpose of the application is to test, compare and measure time execution</b
 
 ![List of features](files/firearrow_1.jpg "A list of features")
 ![Filesystem feature](files/firearrow_2.jpg "A erase file feature")
-![Async feature](files/firearrow_3.jpg "A asynchronously feature")
-![Simd feature](files/firearrow_4.jpg "A simd feature")
 
 Features:
 ---------
