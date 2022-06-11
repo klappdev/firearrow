@@ -20,6 +20,7 @@ if (${ENABLE_CPP_TESTS} MATCHES "true")
     add_executable(firearrowTest
             ${TEST_SRC_DIR}/EnumerationTest.cpp
             ${TEST_SRC_DIR}/PropertyTest.cpp
+            ${TEST_SRC_DIR}/NullabilityTest.cpp
     )
 
     target_link_libraries(firearrowTest firearrow gtest)

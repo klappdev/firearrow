@@ -31,7 +31,6 @@ namespace kl::util::property {
     class Setter {
     public:
         constexpr explicit Setter(const T& value) : value(value) {}
-        constexpr explicit Setter(T&& value) : value(std::forward<T>(value)) {}
         ~Setter() = default;
 
         constexpr Setter(const Setter&) = default;
@@ -42,11 +41,6 @@ namespace kl::util::property {
 
         constexpr Setter& operator=(const T& newValue) {
             this->value = newValue;
-            return *this;
-        }
-
-        constexpr Setter& operator=(T&& newValue) {
-            this->value = std::forward<T>(newValue);
             return *this;
         }
 

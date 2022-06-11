@@ -63,28 +63,30 @@ namespace kl::net {
             return nullptr;
         }
 
-        if (auto result = socket.receive(); result.hasError()) {
+        Result<std::vector<std::string>, NetworkError> result = socket.receive();
+
+        if (result.hasError()) {
             std::string& message = result.error().message;
             env->ThrowNew(networkExceptionClass, message.c_str());
             return nullptr;
-        } else {
-            std::vector<std::string> lines = result.value();
-            std::string rawResult;
-
-            /*FIXME: using std::ranges*/
-            for (const std::string& line : lines) {
-                if (line.starts_with("{") && line.ends_with("}")) {
-                    rawResult = line;
-                    break;
-                }
-            }
-
-            auto endTime = std::chrono::steady_clock::now();
-
-            return env->NewObject(networkResultClass, networkResultConstructorId,
-                  env->NewStringUTF(rawResult.c_str()),
-                  std::chrono::duration_cast<std::chrono::milliseconds>(endTime - beginTime).count());
         }
+
+        std::vector<std::string> lines = result.value();
+        std::string rawResult;
+
+        /*FIXME: using std::ranges*/
+        for (const std::string& line : lines) {
+            if (line.starts_with("{") && line.ends_with("}")) {
+                rawResult = line;
+                break;
+            }
+        }
+
+        auto endTime = std::chrono::steady_clock::now();
+
+        return env->NewObject(networkResultClass, networkResultConstructorId,
+              env->NewStringUTF(rawResult.c_str()),
+              std::chrono::duration_cast<std::chrono::milliseconds>(endTime - beginTime).count());
     }
 
     jobject nativePerformAsyncGETRequest(JNIEnv* rawEnv, jclass clazz, jstring jvmUrl, jint jvmPort) {

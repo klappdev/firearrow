@@ -31,7 +31,6 @@ namespace kl::util::property {
     class Property {
     public:
         constexpr explicit Property(const T& value) : value(value) {}
-        constexpr explicit Property(T&& value) : value(std::forward<T>(value)) {}
         ~Property() = default;
 
         constexpr Property(const Property&) = default;
@@ -45,12 +44,7 @@ namespace kl::util::property {
             return *this;
         }
 
-        constexpr Property& operator=(T&& newValue) {
-            this->value = std::forward<T>(newValue);
-            return *this;
-        }
-
-        constexpr operator T() const { return get(); }
+        constexpr operator const T&() const { return get(); }
         constexpr const T& get() { return value; }
 
         constexpr bool operator==(const T& other) const { return value == other; }

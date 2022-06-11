@@ -43,7 +43,6 @@ namespace kl::net {
         request = format(REQUEST_TEMPLATE, address.c_str());
     }
 
-
     Socket::~Socket() {
         disconnect();
     }

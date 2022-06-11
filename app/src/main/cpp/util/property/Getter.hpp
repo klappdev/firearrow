@@ -31,7 +31,6 @@ namespace kl::util::property {
     class Getter {
     public:
         constexpr explicit Getter(const T& value) : value(value) {}
-        constexpr explicit Getter(T&& value) : value(std::forward<T>(value)) {}
         ~Getter() = default;
 
         constexpr Getter(const Getter&) = default;
@@ -40,7 +39,7 @@ namespace kl::util::property {
         constexpr Getter& operator=(const Getter&) = default;
         constexpr Getter& operator=(Getter&&) noexcept = default;
 
-        constexpr operator T() const { return get(); }
+        constexpr operator const T&() const { return get(); }
         constexpr const T& get() const { return value; }
 
         constexpr bool operator==(const T& other) const { return value == other; }
