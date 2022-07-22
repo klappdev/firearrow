@@ -35,34 +35,40 @@ namespace kl::coroutine {
     class Generator;
 
     template<typename T>
-    struct GeneratorPromise {
+    struct GeneratorPromise final {
         using Reference = std::conditional_t<std::is_reference_v<T>, T, T&>;
         using Pointer = Nullable<std::remove_reference_t<T>*>;
 
         GeneratorPromise() : value(nullptr) {}
 
-        Generator<T> get_return_object() noexcept;
+        Generator<T> get_return_object() noexcept /*customisable*/;
 
-        constexpr std::experimental::suspend_always initial_suspend() const noexcept { return {}; }
-        constexpr std::experimental::suspend_always final_suspend() const noexcept { return {}; }
+        constexpr std::experimental::suspend_always initial_suspend() const noexcept /*customisable*/ { return {}; }
+        constexpr std::experimental::suspend_always final_suspend() const noexcept /*customisable*/ { return {}; }
 
         template<typename U = T,
                  typename std::enable_if_t<!std::is_rvalue_reference_v<U>>>
-        std::experimental::suspend_always yield_value(std::remove_reference_t<T>& data) noexcept {
+        std::experimental::suspend_always yield_value(std::remove_reference_t<T>& data) noexcept /*customisable*/ {
             this->value = std::addressof(data);
             return {};
         }
 
-        std::experimental::suspend_always yield_value(std::remove_reference_t<T>&& data) noexcept {
+        std::experimental::suspend_always yield_value(std::remove_reference_t<T>&& data) noexcept /*customisable*/ {
             this->value = std::addressof(data);
             return {};
         }
 
-        void unhandled_exception() {
+        void return_void() /*customisable*/ {}
+
+        void unhandled_exception() /*customisable*/ {
             this->error = std::current_exception();
         }
 
-        void return_void() {}
+        void rethrowIfError() {
+            if (error) {
+                std::rethrow_exception(std::move(error));
+            }
+        }
 
         Pointer value;
         std::exception_ptr error;
@@ -77,7 +83,7 @@ namespace kl::coroutine {
     struct GeneratorSentinel final {};
 
     template<typename T>
-    class GeneratorIterator {
+    class GeneratorIterator final {
     public:
         GeneratorIterator() noexcept : continuation(nullptr) {}
 
@@ -96,7 +102,9 @@ namespace kl::coroutine {
         GeneratorIterator& operator++() {
             continuation.resume();
 
-            if (continuation.done()) { return *this; }
+            if (continuation.done()) {
+                continuation.promise().rethrowIfError();
+            }
 
             return *this;
         }
@@ -136,7 +144,9 @@ namespace kl::coroutine {
             if (continuation) {
                 continuation.resume();
 
-                if (continuation.done()) { return GeneratorIterator<T>(); }
+                if (continuation.done()) {
+                    continuation.promise().rethrowIfError();
+                }
             }
 
             return GeneratorIterator<T> { continuation };

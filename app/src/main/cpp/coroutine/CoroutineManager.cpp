@@ -74,7 +74,7 @@ namespace kl::coroutine {
         auto beginTime = std::chrono::steady_clock::now();
 
         std::future<Task<void>> future = executeTask<void>(
-                [&]() {  env->CallVoidMethod(jvmRunnable, runMethodId); });
+                [&]() { env->CallVoidMethod(jvmRunnable, runMethodId); });
         Task<void> task = future.get();
 
         auto endTime = std::chrono::steady_clock::now();

@@ -44,9 +44,9 @@ namespace kl::coroutine {
 
         ~Task() = default;
 
-        bool await_ready() const { return false; }
-        void await_resume() {}
-        void await_suspend(std::experimental::coroutine_handle<> handler) {
+        bool await_ready() const /*customisable*/ { return false; }
+        void await_resume() /*customisable*/ {}
+        void await_suspend(std::experimental::coroutine_handle<> handler) /*customisable*/ {
             value_ = callback();
 
             if (!handler.done()) {
@@ -75,9 +75,9 @@ namespace kl::coroutine {
 
         ~Task() = default;
 
-        bool await_ready() const { return false; }
-        void await_resume() {}
-        void await_suspend(std::experimental::coroutine_handle<> handler) {
+        bool await_ready() const /*customisable*/ { return false; }
+        void await_resume() /*customisable*/ {}
+        void await_suspend(std::experimental::coroutine_handle<> handler) /*customisable*/ {
             callback();
 
             if (!handler.done()) {

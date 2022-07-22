@@ -26,56 +26,50 @@
 #include <experimental/coroutine>
 #include <future>
 
-/*
- * FIXME: maybe make specialization for Result<std::future<R>, std::exception_ptr>
- */
 template<typename R, typename... Args>
 struct std::experimental::coroutine_traits<std::future<R>, Args...> {
     struct promise_type {
     public:
-        auto get_return_object() { return offer.get_future(); }
+        auto get_return_object() /*customisable*/ { return offer.get_future(); }
 
-        std::experimental::suspend_never initial_suspend() { return {}; }
-        std::experimental::suspend_never final_suspend() noexcept  { return {}; }
+        std::experimental::suspend_never initial_suspend() const noexcept /*customisable*/ { return {}; }
+        std::experimental::suspend_never final_suspend() const noexcept /*customisable*/ { return {}; }
 
-        void set_exception(std::exception_ptr e) {
-            offer.set_exception(std::move(e));
+        void set_exception(std::exception_ptr error) {
+            offer.set_exception(std::move(error));
         }
 
-        void unhandled_exception() {
+        void unhandled_exception() /*customisable*/ {
             std::current_exception();
         }
 
         template <typename U>
-        void return_value(U &&u) {
-            offer.set_value(std::forward<U>(u));
+        void return_value(U&& value) /*customisable*/ {
+            offer.set_value(std::forward<U>(value));
         }
     private:
         std::promise<R> offer;
     };
 };
 
-/*
- * FIXME: maybe make specialization for Result<std::future<void>, std::exception_ptr>
- */
 template<typename... Args>
 struct std::experimental::coroutine_traits<std::future<void>, Args...> {
     struct promise_type {
     public:
-        auto get_return_object() { return offer.get_future(); }
+        auto get_return_object() /*customisable*/ { return offer.get_future(); }
 
-        std::experimental::suspend_never initial_suspend() { return {}; }
-        std::experimental::suspend_never final_suspend() noexcept { return {}; }
+        std::experimental::suspend_never initial_suspend() const noexcept /*customisable*/ { return {}; }
+        std::experimental::suspend_never final_suspend() const noexcept /*customisable*/ { return {}; }
 
         void set_exception(std::exception_ptr e) {
             offer.set_exception(std::move(e));
         }
 
-        void unhandled_exception() {
+        void unhandled_exception() /*customisable*/ {
             std::current_exception();
         }
 
-        void return_void() {
+        void return_void() /*customisable*/ {
             offer.set_value();
         }
     private:
