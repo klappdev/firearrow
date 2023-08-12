@@ -1,7 +1,7 @@
 /*
  * Licensed under the MIT License <http://opensource.org/licenses/MIT>.
  * SPDX-License-Identifier: MIT
- * Copyright (c) 2022 https://github.com/klappdev
+ * Copyright (c) 2022-2023 https://github.com/klappdev
  *
  * Permission is hereby  granted, free of charge, to any  person obtaining a copy
  * of this software and associated  documentation files (the "Software"), to deal
@@ -31,6 +31,8 @@ import androidx.activity.result.contract.ActivityResultContract;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import java.util.Objects;
+
 public class SettingActivityContract extends ActivityResultContract<Void, Boolean> {
     public final static String RESULT_KEY = "settings_update";
 
@@ -45,7 +47,7 @@ public class SettingActivityContract extends ActivityResultContract<Void, Boolea
         if (resultCode != Activity.RESULT_OK) {
             return false;
         } else {
-            return intent != null && intent.getExtras().getBoolean(RESULT_KEY);
+            return intent != null && Objects.requireNonNull(intent.getExtras()).getBoolean(RESULT_KEY);
         }
     }
 }

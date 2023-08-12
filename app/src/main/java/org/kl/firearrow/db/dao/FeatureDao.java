@@ -1,7 +1,7 @@
 /*
  * Licensed under the MIT License <http://opensource.org/licenses/MIT>.
  * SPDX-License-Identifier: MIT
- * Copyright (c) 2022 https://github.com/klappdev
+ * Copyright (c) 2022-2023 https://github.com/klappdev
  *
  * Permission is hereby  granted, free of charge, to any  person obtaining a copy
  * of this software and associated  documentation files (the "Software"), to deal
@@ -60,9 +60,11 @@ public interface FeatureDao {
     @Query("SELECT * FROM feature ORDER BY name ASC")
     PagingSource<Integer, Feature> getAll();
 
-    @Query("SELECT * FROM feature ORDER BY " +
-           "   CASE WHEN :isAsc = 1 THEN date END ASC, " +
-           "   CASE WHEN :isAsc = 0 THEN date END DESC")
+    @Query("""
+              SELECT * FROM feature ORDER BY
+              CASE WHEN :isAsc = 1 THEN date END ASC,
+              CASE WHEN :isAsc = 0 THEN date END DESC
+           """)
     PagingSource<Integer, Feature> sortByDate(boolean isAsc);
 
     @Query("SELECT * FROM feature WHERE name LIKE :name")

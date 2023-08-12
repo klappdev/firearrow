@@ -1,7 +1,7 @@
 /*
  * Licensed under the MIT License <http://opensource.org/licenses/MIT>.
  * SPDX-License-Identifier: MIT
- * Copyright (c) 2022 https://github.com/klappdev
+ * Copyright (c) 2022-2023 https://github.com/klappdev
  *
  * Permission is hereby  granted, free of charge, to any  person obtaining a copy
  * of this software and associated  documentation files (the "Software"), to deal
@@ -63,39 +63,33 @@ public final class ChooseFeatureListener implements View.OnClickListener {
 
     private String executeFeature() {
         final Context context = activity.getApplicationContext();
-        final String result;
 
-        switch ((int) featureId) {
-            case 1: result = FileManager.javaDeleteFile(context); break;
-            case 2: result = FileManager.cppEraseFile(context, OverwriteMode.SIMPLE_MODE); break;
-            case 3: result = FileManager.cppEraseFile(context, OverwriteMode.OPENBSD_MODE); break;
-            case 4: result = FileManager.cppEraseFile(context, OverwriteMode.DOD_MODE); break;
-            case 5: result = FileManager.javaDeleteDirectory(context); break;
-            case 6: result = FileManager.cppEraseDirectory(context); break;
-            case 7: result = FileManager.javaEraseDirectoryRecursive(context); break;
-            case 8: result = FileManager.cppEraseDirectoryRecursive(context); break;
-
-            case 9: result = CoroutineManager.javaThreadRunnableOperation(); break;
-            case 10: result = CoroutineManager.cppCoroutineRunnableOperation(); break;
-            case 11: result = CoroutineManager.javaThreadCallableOperation(); break;
-            case 12: result = CoroutineManager.cppCoroutineCallableOperation(); break;
-            case 13: result = CoroutineManager.javaStreamGenerateNumbers(); break;
-            case 14: result = CoroutineManager.cppGeneratorYieldNumbers(); break;
-            case 15: result = CoroutineManager.javaStreamGenerateSequence(); break;
-            case 16: result = CoroutineManager.cppGeneratorYieldSequence(); break;
-
-            case 17: result = SimdManager.javaAddTwoArrayNumbers(); break;
-            case 18: result = SimdManager.cppAddTwoArrayNumbers(); break;
-            case 19: result = SimdManager.javaStreamAddTwoArrayNumbers(); break;
-            case 20: result = SimdManager.cppSimdAddTwoArrayNumbers(); break;
-
-            case 21: result = NetworkManager.javaPerformGETRequest(); break;
-            case 22: result = NetworkManager.cppPerformGETRequest(); break;
-            case 23: result = NetworkManager.javaPerformAsyncGETRequest(); break;
-            case 24: result = NetworkManager.cppPerformAsyncGETRequest(); break;
-            default: result = "Unknown operation!!!"; break;
-        }
-
-        return result;
+        return switch ((int) featureId) {
+            case 1 -> FileManager.javaDeleteFile(context);
+            case 2 -> FileManager.cppEraseFile(context, OverwriteMode.SIMPLE_MODE);
+            case 3 -> FileManager.cppEraseFile(context, OverwriteMode.OPENBSD_MODE);
+            case 4 -> FileManager.cppEraseFile(context, OverwriteMode.DOD_MODE);
+            case 5 -> FileManager.javaDeleteDirectory(context);
+            case 6 -> FileManager.cppEraseDirectory(context);
+            case 7 -> FileManager.javaEraseDirectoryRecursive(context);
+            case 8 -> FileManager.cppEraseDirectoryRecursive(context);
+            case 9 -> CoroutineManager.javaThreadRunnableOperation();
+            case 10 -> CoroutineManager.cppCoroutineRunnableOperation();
+            case 11 -> CoroutineManager.javaThreadCallableOperation();
+            case 12 -> CoroutineManager.cppCoroutineCallableOperation();
+            case 13 -> CoroutineManager.javaStreamGenerateNumbers();
+            case 14 -> CoroutineManager.cppGeneratorYieldNumbers();
+            case 15 -> CoroutineManager.javaStreamGenerateSequence();
+            case 16 -> CoroutineManager.cppGeneratorYieldSequence();
+            case 17 -> SimdManager.javaAddTwoArrayNumbers();
+            case 18 -> SimdManager.cppAddTwoArrayNumbers();
+            case 19 -> SimdManager.javaStreamAddTwoArrayNumbers();
+            case 20 -> SimdManager.cppSimdAddTwoArrayNumbers();
+            case 21 -> NetworkManager.javaPerformGETRequest();
+            case 22 -> NetworkManager.cppPerformGETRequest();
+            case 23 -> NetworkManager.javaPerformAsyncGETRequest();
+            case 24 -> NetworkManager.cppPerformAsyncGETRequest();
+            default -> "Unknown operation!!!";
+        };
     }
 }

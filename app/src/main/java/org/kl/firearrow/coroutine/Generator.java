@@ -1,7 +1,7 @@
 /*
  * Licensed under the MIT License <http://opensource.org/licenses/MIT>.
  * SPDX-License-Identifier: MIT
- * Copyright (c) 2022 https://github.com/klappdev
+ * Copyright (c) 2022-2023 https://github.com/klappdev
  *
  * Permission is hereby  granted, free of charge, to any  person obtaining a copy
  * of this software and associated  documentation files (the "Software"), to deal
@@ -26,17 +26,15 @@ package org.kl.firearrow.coroutine;
 import androidx.annotation.NonNull;
 
 import java.util.Iterator;
+import java.util.Objects;
 
-import lombok.Getter;
+public record Generator<E extends Number> (
+    Number[] array,
+    long duration
+) implements Iterable<E> {
 
-public final class Generator<E extends Number> implements Iterable<E> {
-    private final Object[] array;
-    @Getter
-    private final long duration;
-
-    public Generator(E[] array, long duration) {
-        this.array = array;
-        this.duration = duration;
+    public Generator {
+        Objects.requireNonNull(array, "Field object can't be null");
     }
 
     @NonNull
@@ -45,7 +43,7 @@ public final class Generator<E extends Number> implements Iterable<E> {
         return new GeneratorIterator();
     }
 
-    private class GeneratorIterator implements Iterator<E> {
+    private final class GeneratorIterator implements Iterator<E> {
         private int index = 0;
 
         @Override

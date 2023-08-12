@@ -1,7 +1,7 @@
 /*
  * Licensed under the MIT License <http://opensource.org/licenses/MIT>.
  * SPDX-License-Identifier: MIT
- * Copyright (c) 2022 https://github.com/klappdev
+ * Copyright (c) 2022-2023 https://github.com/klappdev
  *
  * Permission is hereby  granted, free of charge, to any  person obtaining a copy
  * of this software and associated  documentation files (the "Software"), to deal
@@ -46,6 +46,7 @@ import org.kl.firearrow.db.entity.Feature;
 )
 public abstract class CommonDatabase extends RoomDatabase {
     private static final String FILE_DATABASE_NAME = "firearrow.db";
+
     public abstract CategoryDao categoryDao();
     public abstract FeatureDao featureDao();
     public abstract CategoryFeaturesDao categoryFeaturesDao();

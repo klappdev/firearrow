@@ -1,7 +1,7 @@
 /*
  * Licensed under the MIT License <http://opensource.org/licenses/MIT>.
  * SPDX-License-Identifier: MIT
- * Copyright (c) 2022 https://github.com/klappdev
+ * Copyright (c) 2022-2023 https://github.com/klappdev
  *
  * Permission is hereby  granted, free of charge, to any  person obtaining a copy
  * of this software and associated  documentation files (the "Software"), to deal
@@ -42,9 +42,9 @@ final class ReleaseLogTree extends Timber.Tree {
     @Override
     protected void log(int priority, @Nullable String tag, @NonNull String message, @Nullable Throwable throwable) {
         switch (priority) {
-            case Log.ASSERT: Log.wtf(tag, message);
-            case Log.ERROR: Log.e(tag, message);
-            default: Log.println(priority, tag, message);
+            case Log.ASSERT -> Log.wtf(tag, message);
+            case Log.ERROR -> Log.e(tag, message);
+            default -> Log.println(priority, tag, message);
         }
     }
 }

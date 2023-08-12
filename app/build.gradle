@@ -9,6 +9,7 @@ plugins {
 android {
     compileSdkVersion rootProject.compileSdkVersion
     buildToolsVersion "30.0.3"
+    namespace "org.kl.firearrow"
 
     defaultConfig {
         applicationId "org.kl.firearrow"
@@ -38,8 +39,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
     externalNativeBuild {
         cmake {
@@ -50,6 +51,7 @@ android {
     buildFeatures {
         viewBinding true
         dataBinding true
+        buildConfig true
     }
 }
 
@@ -72,6 +74,11 @@ protobuf {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
+    //Kotlin
+    implementation(platform("org.jetbrains.kotlin:kotlin-bom:1.8.10"))
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.8.10"
+
+    // Base
     implementation "androidx.startup:startup-runtime:$rootProject.appStartupVersion"
     implementation "androidx.appcompat:appcompat:$rootProject.appCompatVersion"
 

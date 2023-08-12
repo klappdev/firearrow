@@ -1,7 +1,7 @@
 /*
  * Licensed under the MIT License <http://opensource.org/licenses/MIT>.
  * SPDX-License-Identifier: MIT
- * Copyright (c) 2022 https://github.com/klappdev
+ * Copyright (c) 2022-2023 https://github.com/klappdev
  *
  * Permission is hereby  granted, free of charge, to any  person obtaining a copy
  * of this software and associated  documentation files (the "Software"), to deal
@@ -103,12 +103,12 @@ public final class CoroutineManager {
                                   .collect(Collectors.joining(","));
             });
 
-            if (!task.isFinished()) {
+            if (!task.finished()) {
                 builder.append("> Coroutine not finished\n");
             }
 
             builder.append("> Sequence after: ").append("[").append(result[0]).append("]").append("\n");
-            builder.append("> C++ execution time: ").append(task.getDuration()).append(" ms\n");
+            builder.append("> C++ execution time: ").append(task.duration()).append(" ms\n");
         } catch (CoroutineException e) {
             builder.append("> Coroutine exception: ").append(e.getMessage()).append("\n");
         }
@@ -172,8 +172,8 @@ public final class CoroutineManager {
                 return "value " + key + ", index " + index;
             });
 
-            builder.append("> Searched ").append(task.getValue()).append("\n");
-            builder.append("> C++ execution time: ").append(task.getDuration()).append(" ms\n");
+            builder.append("> Searched ").append(task.value()).append("\n");
+            builder.append("> C++ execution time: ").append(task.duration()).append(" ms\n");
         } catch (CoroutineException e) {
             builder.append("> Generator exception: ").append(e.getMessage()).append("\n");
         }
@@ -223,7 +223,7 @@ public final class CoroutineManager {
             }
 
             builder.append("]\n");
-            builder.append("> C++ execution time: ").append(generator.getDuration()).append(" ms\n");
+            builder.append("> C++ execution time: ").append(generator.duration()).append(" ms\n");
         } catch (CoroutineException e) {
             builder.append("> Generator exception: ").append(e.getMessage()).append("\n");
         }
@@ -279,7 +279,7 @@ public final class CoroutineManager {
             }
 
             builder.append("]\n");
-            builder.append("> C++ execution time: ").append(generator.getDuration()).append(" ms\n");
+            builder.append("> C++ execution time: ").append(generator.duration()).append(" ms\n");
         } catch (CoroutineException e) {
             builder.append("> Generator exception: ").append(e.getMessage()).append("\n");
         }

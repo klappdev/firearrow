@@ -42,6 +42,6 @@ Used third party libraries:
 
 Languages:
 ----------
-  * Java 11
+  * Java 17
   * C++ 20
   

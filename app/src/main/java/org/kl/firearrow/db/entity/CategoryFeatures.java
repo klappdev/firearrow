@@ -1,7 +1,7 @@
 /*
  * Licensed under the MIT License <http://opensource.org/licenses/MIT>.
  * SPDX-License-Identifier: MIT
- * Copyright (c) 2022 https://github.com/klappdev
+ * Copyright (c) 2022-2023 https://github.com/klappdev
  *
  * Permission is hereby  granted, free of charge, to any  person obtaining a copy
  * of this software and associated  documentation files (the "Software"), to deal
@@ -29,6 +29,7 @@ import androidx.room.Relation;
 import java.util.List;
 import lombok.Value;
 
+//FIXME: replace with Java 17 record, when androidx.room will support
 @Value
 public final class CategoryFeatures {
     @Embedded
