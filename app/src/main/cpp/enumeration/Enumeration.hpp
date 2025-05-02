@@ -1,7 +1,7 @@
 /*
  * Licensed under the MIT License <http://opensource.org/licenses/MIT>.
  * SPDX-License-Identifier: MIT
- * Copyright (c) 2022 https://github.com/klappdev
+ * Copyright (c) 2022-2025 https://github.com/klappdev
  *
  * Permission is hereby  granted, free of charge, to any  person obtaining a copy
  * of this software and associated  documentation files (the "Software"), to deal
@@ -27,9 +27,9 @@
 #include <string>
 #include <optional>
 
-#include <util/arrays/ArrayUtils.hpp>
+#include <arrays/ArrayUtils.hpp>
 
-namespace kl::util::enumeration {
+namespace firearrow::enumeration {
 
     template<typename E>
     concept Enumerable = std::is_enum_v<E>;

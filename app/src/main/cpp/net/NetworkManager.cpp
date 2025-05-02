@@ -1,7 +1,7 @@
 /*
  * Licensed under the MIT License <http://opensource.org/licenses/MIT>.
  * SPDX-License-Identifier: MIT
- * Copyright (c) 2022 https://github.com/klappdev
+ * Copyright (c) 2022-2025 https://github.com/klappdev
  *
  * Permission is hereby  granted, free of charge, to any  person obtaining a copy
  * of this software and associated  documentation files (the "Software"), to deal
@@ -22,10 +22,12 @@
  * SOFTWARE.
  */
 
-#include "Socket.hpp"
+#include "HttpClient.hpp"
 
+#include <jni/UniqueJniEnv.hpp>
 #include <jni/UniqueUtfChars.hpp>
-#include <util/nullability/NonNull.hpp>
+#include <nullability/NonNull.hpp>
+#include <time/StopWatch.hpp>
 
 namespace {
     jclass networkExceptionClass = nullptr;
@@ -34,39 +36,55 @@ namespace {
     jmethodID networkResultConstructorId = nullptr;
 }
 
-using namespace kl::util::nullability;
+namespace firearrow::net {
+    using namespace nullability;
+    using namespace time;
 
-namespace kl::net {
+    jlong nativeHttpClientCreate(JNIEnv* rawEnv, jclass clazz) {
+        auto* httpClient = new HttpClient();
+        return reinterpret_cast<jlong>(httpClient);
+    }
 
-    jobject nativePerformGETRequest(JNIEnv* rawEnv, jclass clazz, jstring jvmUrl, jint jvmPort) {
-        auto env = makeNonNull(rawEnv);
-        auto beginTime = std::chrono::steady_clock::now();
+    void nativeHttpClientDestroy(JNIEnv* env, jclass clazz, jlong nativeHandle) {
+        auto* httpClient = reinterpret_cast<HttpClient*>(nativeHandle);
+        delete httpClient;
+    }
 
-        jni::UniqueUtfChars jvmUniqueUrl(env, jvmUrl);
-        Socket socket(static_cast<const char*>(jvmUniqueUrl.get()), jvmPort);
+    jobject nativePerformHttpRequest(JNIEnv* rawEnv, jclass clazz, jlong nativeHandle, jstring jvmUrl, jint jvmPort) {
+        auto* httpClient = reinterpret_cast<HttpClient*>(nativeHandle);
 
-        if (auto result = socket.create(); result.hasError()) {
-            std::string& message = result.error().message;
+        if (httpClient == nullptr) {
+            return nullptr;
+        }
+
+        jni::UniqueJniEnv env;
+        jni::UniqueUtfChars jvmUniqueUrl(rawEnv, jvmUrl);
+
+        StopWatch stopWatch;
+        stopWatch.start();
+
+        if (auto result = httpClient->create(static_cast<const char*>(jvmUniqueUrl.get()), jvmPort); result.hasError()) {
+            const std::string& message = result.error().message;
             env->ThrowNew(networkExceptionClass, message.c_str());
             return nullptr;
         }
 
-        if (auto result = socket.connect(); result.hasError()) {
-            std::string& message = result.error().message;
+        if (auto result = httpClient->connect(); result.hasError()) {
+            const std::string& message = result.error().message;
             env->ThrowNew(networkExceptionClass, message.c_str());
             return nullptr;
         }
 
-        if (auto result = socket.send(); result.hasError()) {
-            std::string& message = result.error().message;
+        if (auto result = httpClient->send(); result.hasError()) {
+            const std::string& message = result.error().message;
             env->ThrowNew(networkExceptionClass, message.c_str());
             return nullptr;
         }
 
-        Result<std::vector<std::string>, NetworkError> result = socket.receive();
+        Result<std::vector<std::string>, NetworkError> result = httpClient->receive();
 
         if (result.hasError()) {
-            std::string& message = result.error().message;
+            const std::string& message = result.error().message;
             env->ThrowNew(networkExceptionClass, message.c_str());
             return nullptr;
         }
@@ -82,48 +100,64 @@ namespace kl::net {
             }
         }
 
-        auto endTime = std::chrono::steady_clock::now();
+        stopWatch.stop();
 
         return env->NewObject(networkResultClass, networkResultConstructorId,
-              env->NewStringUTF(rawResult.c_str()),
-              std::chrono::duration_cast<std::chrono::milliseconds>(endTime - beginTime).count());
+                              env->NewStringUTF(rawResult.c_str()), stopWatch.getDuration());
     }
 
-    jobject nativePerformAsyncGETRequest(JNIEnv* rawEnv, jclass clazz, jstring jvmUrl, jint jvmPort) {
+    jobject nativePerformAsyncHttpRequest(JNIEnv* rawEnv, jclass clazz, jlong nativeHandle, jstring jvmUrl, jint jvmPort) {
         /*FIXME: implement in future*/
         return nullptr;
     }
 
-    constexpr std::array<JNINativeMethod, 2> JNI_METHODS = {{
-        {"performGETRequest",
-         "(Ljava/lang/String;I)Lorg/kl/firearrow/net/NetworkResult;",
-         (void*)nativePerformGETRequest},
-        {"performAsyncGETRequest",
-         "(Ljava/lang/String;I)Lorg/kl/firearrow/net/NetworkResult;",
-         (void*)nativePerformAsyncGETRequest}
+    constexpr std::array<JNINativeMethod, 4> JNI_METHODS = {{
+        {"nativeCreate", "()J", (void*)nativeHttpClientCreate},
+        {"nativeDestroy", "(J)V", (void*)nativeHttpClientDestroy},
+        {"nativePerformHttpRequest",
+         "(JLjava/lang/String;I)Lorg/kl/firearrow/net/NetworkResult;",
+         (void*)nativePerformHttpRequest},
+        {"nativePerformAsyncHttpRequest",
+         "(JLjava/lang/String;I)Lorg/kl/firearrow/net/NetworkResult;",
+         (void*)nativePerformAsyncHttpRequest}
     }};
 }
 
-jint registerNetworkManager(JNIEnv* rawEnv) {
-    using kl::net::JNI_METHODS;
-    auto env = makeNonNull(rawEnv);
+jint registerNetworkManager(JNIEnv* env) {
+    using firearrow::net::JNI_METHODS;
 
     jclass temporaryClass = env->FindClass("org/kl/firearrow/net/NetworkException");
     networkExceptionClass = (jclass) env->NewGlobalRef(temporaryClass);
 
+    if (networkExceptionClass == nullptr) {
+        return JNI_ERR;
+    }
+
     temporaryClass = env->FindClass("org/kl/firearrow/net/NetworkResult");
     networkResultClass = (jclass) env->NewGlobalRef(temporaryClass);
 
+    if (networkResultClass == nullptr) {
+        return JNI_ERR;
+    }
+
     networkResultConstructorId = env->GetMethodID(networkResultClass, "<init>", "(Ljava/lang/String;J)V");
 
+    if (networkResultConstructorId == nullptr) {
+        return JNI_ERR;
+    }
+
     jclass networkManagerClass = env->FindClass("org/kl/firearrow/net/NetworkManager");
+
+    if (networkManagerClass == nullptr) {
+        return JNI_ERR;
+    }
+
+    env->DeleteLocalRef(temporaryClass);
+
     return env->RegisterNatives(networkManagerClass, JNI_METHODS.data(), JNI_METHODS.size());
 }
 
-void unregisterNetworkManager(JNIEnv* rawEnv) {
-    auto env = makeNonNull(rawEnv);
-
+void unregisterNetworkManager(JNIEnv* env) {
     env->DeleteGlobalRef(networkExceptionClass);
     env->DeleteGlobalRef(networkResultClass);
 }
-

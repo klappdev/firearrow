@@ -1,7 +1,7 @@
 /*
  * Licensed under the MIT License <http://opensource.org/licenses/MIT>.
  * SPDX-License-Identifier: MIT
- * Copyright (c) 2022 https://github.com/klappdev
+ * Copyright (c) 2025 https://github.com/klappdev
  *
  * Permission is hereby  granted, free of charge, to any  person obtaining a copy
  * of this software and associated  documentation files (the "Software"), to deal
@@ -21,33 +21,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE  OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+package org.kl.firearrow.di;
 
-#include <vector>
+import android.content.Context;
 
-#include "NetworkError.hpp"
-#include <util/error/Result.hpp>
+import androidx.annotation.NonNull;
 
-namespace kl::net {
-    using namespace kl::util::error;
+import javax.inject.Singleton;
 
-    class Socket final {
-    public:
-        Socket(const std::string& address, std::uint16_t port);
-        ~Socket();
+import dagger.Module;
+import dagger.Provides;
+import dagger.hilt.InstallIn;
+import dagger.hilt.android.qualifiers.ApplicationContext;
+import dagger.hilt.components.SingletonComponent;
 
-        Result<std::uint32_t, NetworkError> create();
-        Result<void, NetworkError> connect();
-        void disconnect();
+import org.kl.firearrow.net.NetworkConnectivityHelper;
 
-        [[nodiscard]] bool isOpened() const;
+@Module
+@InstallIn(SingletonComponent.class)
+public class NetworkModule {
 
-        Result<std::int64_t, NetworkError> send();
-        Result<std::vector<std::string>, NetworkError> receive() const;
-
-    private:
-        std::int32_t fd;
-        std::string address;
-        std::uint16_t port;
-        std::string request;
-    };
+    @Provides
+    @Singleton
+    public NetworkConnectivityHelper providesNetworkConnectivityHelper(@ApplicationContext @NonNull Context context) {
+        return new NetworkConnectivityHelper(context);
+    }
 }

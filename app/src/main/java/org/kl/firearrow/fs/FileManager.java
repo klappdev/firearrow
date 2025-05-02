@@ -1,7 +1,7 @@
 /*
  * Licensed under the MIT License <http://opensource.org/licenses/MIT>.
  * SPDX-License-Identifier: MIT
- * Copyright (c) 2022 https://github.com/klappdev
+ * Copyright (c) 2022-2025 https://github.com/klappdev
  *
  * Permission is hereby  granted, free of charge, to any  person obtaining a copy
  * of this software and associated  documentation files (the "Software"), to deal
@@ -28,31 +28,91 @@ import androidx.annotation.NonNull;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.lang.ref.Cleaner;
 
-public final class FileManager {
+import org.kl.firearrow.time.StopWatch;
+
+public final class FileManager implements AutoCloseable {
 
     private final static String ERASE_DIRECTORY = "erase";
     private final static String ERASE_FILE1 = "erase1.txt";
     private final static String ERASE_FILE2 = "erase2.txt";
     private final static int COUNT_LINES = 50;
 
-    private FileManager() throws IllegalAccessException {
-        throw new IllegalAccessException("Can't create instance");
+    private long nativeHandle;
+
+    private static final Cleaner cleaner = Cleaner.create();
+    private final Cleaner.Cleanable cleanable;
+    private final Destructor destructor;
+
+    private final StopWatch stopWatch;
+
+    public FileManager() {
+        if (nativeHandle == 0) {
+            nativeHandle = nativeCreate();
+        }
+
+        this.destructor = new Destructor(nativeHandle);
+        this.cleanable = cleaner.register(this, destructor);
+
+        this.stopWatch = new StopWatch();
     }
 
-    public static native long eraseFile(@NonNull String path) throws FileException;
+    private static class Destructor implements Runnable {
+        private long nativeHandle;
 
-    public static native long eraseFile(@NonNull String path, OverwriteMode mode) throws FileException;
+        private Destructor(long nativeHandle) {
+            this.nativeHandle = nativeHandle;
+        }
 
-    public static native long eraseDirectory(@NonNull String path, boolean recursive) throws FileException;
+        @Override
+        public void run() {
+            if (nativeHandle != 0) {
+                nativeDestroy(nativeHandle);
+                nativeHandle = 0;
+            }
+        }
+    }
 
-    public static native long eraseDirectory(@NonNull String path, OverwriteMode mode, boolean recursive) throws FileException;
+    @Override
+    public void close() {
+        cleanable.clean();
+    }
 
-    public static String javaDeleteFile(@NonNull Context context) {
+    private static native long nativeCreate();
+
+    private static native void nativeDestroy(long nativeHandle);
+
+    private static native long nativeEraseFile(long nativeHandle, @NonNull String path) throws FileException;
+
+    private static native long nativeEraseFile(long nativeHandle, @NonNull String path, OverwriteMode mode) throws FileException;
+
+    private static native long nativeEraseDirectory(long nativeHandle, @NonNull String path, boolean recursive) throws FileException;
+
+    private static native long nativeEraseDirectory(long nativeHandle, @NonNull String path, OverwriteMode mode, boolean recursive) throws FileException;
+
+    public long eraseFile(@NonNull String path) throws FileException {
+        return nativeEraseFile(nativeHandle, path);
+    }
+
+    public long eraseFile(@NonNull String path, OverwriteMode mode) throws FileException {
+        return nativeEraseFile(nativeHandle, path, mode);
+    }
+
+    public long eraseDirectory(@NonNull String path, boolean recursive) throws FileException {
+        return nativeEraseDirectory(nativeHandle, path, recursive);
+    }
+
+    public long eraseDirectory(@NonNull String path, OverwriteMode mode, boolean recursive) throws FileException {
+        return nativeEraseDirectory(nativeHandle, path, mode, recursive);
+    }
+
+    public String javaDeleteFile(@NonNull Context context) {
+        stopWatch.reset();
+        stopWatch.start();
+
         final var builder = new StringBuilder();
-        final long beginTime = System.currentTimeMillis();
-
-        builder.append("\nStart deleting file\n");
+        builder.append("\nStart Java deleting file\n");
 
         final var directory = createDirectory(context, builder);
         final var file = new File(directory, ERASE_FILE2);
@@ -65,17 +125,18 @@ public final class FileManager {
             builder.append("> File ").append(filePath).append(" didn't deleted\n");
         }
 
-        final long endTime = System.currentTimeMillis();
-        builder.append("> Java execution time: ").append(endTime - beginTime).append(" ms\n");
+        stopWatch.stop();
+        builder.append("> Java execution time: ").append(stopWatch.getDuration()).append(" ms\n");
 
         return builder.toString();
     }
 
-    public static String cppEraseFile(@NonNull Context context, OverwriteMode mode) {
-        final var builder = new StringBuilder();
-        final long beginTime = System.currentTimeMillis();
+    public String cppEraseFile(@NonNull Context context, OverwriteMode mode) {
+        stopWatch.reset();
+        stopWatch.start();
 
-        builder.append("\nStart native erasing file with ").append(mode.name()).append("\n");
+        final var builder = new StringBuilder();
+        builder.append("\nStart C++ erasing file with ").append(mode.name()).append("\n");
 
         final var directory = createDirectory(context, builder);
         final var file = new File(directory, ERASE_FILE1);
@@ -85,7 +146,7 @@ public final class FileManager {
         try {
             builder.append("> Erase file ").append(filePath).append("\n");
 
-            final long duration = FileManager.eraseFile(filePath, mode);
+            final long duration = eraseFile(filePath, mode);
 
             builder.append("> C++ execution time: ").append(duration).append(" ms\n");
         } catch (FileException e) {
@@ -93,17 +154,18 @@ public final class FileManager {
                    .append(e.getMessage()).append("\n");
         }
 
-        final long endTime = System.currentTimeMillis();
-        builder.append("> JNI execution time: ").append(endTime - beginTime).append(" ms\n");
+        stopWatch.stop();
+        builder.append("> JNI execution time: ").append(stopWatch.getDuration()).append(" ms\n");
 
         return builder.toString();
     }
 
-    public static String javaDeleteDirectory(@NonNull Context context) {
-        final var builder = new StringBuilder();
-        final long beginTime = System.currentTimeMillis();
+    public String javaDeleteDirectory(@NonNull Context context) {
+        stopWatch.reset();
+        stopWatch.start();
 
-        builder.append("\nStart deleting directory\n");
+        final var builder = new StringBuilder();
+        builder.append("\nStart Java deleting directory\n");
 
         final var directory = createDirectory(context, builder);
         final String directoryPath = directory.getPath();
@@ -117,17 +179,18 @@ public final class FileManager {
         builder.append("> Delete directory ").append(directoryPath).append("\n");
         deleteDirectory(directory, builder);
 
-        final long endTime = System.currentTimeMillis();
-        builder.append("> Java execution time: ").append(endTime - beginTime).append(" ms\n");
+        stopWatch.stop();
+        builder.append("> Java execution time: ").append(stopWatch.getDuration()).append(" ms\n");
 
         return builder.toString();
     }
 
-    public static String cppEraseDirectory(@NonNull Context context) {
-        final var builder = new StringBuilder();
-        final long beginTime = System.currentTimeMillis();
+    public String cppEraseDirectory(@NonNull Context context) {
+        stopWatch.reset();
+        stopWatch.start();
 
-        builder.append("\nStart native erasing directory\n");
+        final var builder = new StringBuilder();
+        builder.append("\nStart C++ erasing directory\n");
 
         final var directory = createDirectory(context, builder);
         final String directoryPath = directory.getPath();
@@ -141,7 +204,7 @@ public final class FileManager {
         try {
             builder.append("> Erase directory ").append(directoryPath).append("\n");
 
-            final long duration = FileManager.eraseDirectory(directoryPath, false);
+            final long duration = eraseDirectory(directoryPath, false);
 
             builder.append("> C++ execution time: ").append(duration).append(" ms\n");
         } catch (FileException e) {
@@ -149,17 +212,18 @@ public final class FileManager {
                    .append(e.getMessage()).append("\n");
         }
 
-        final long endTime = System.currentTimeMillis();
-        builder.append("> JNI execution time: ").append(endTime - beginTime).append(" ms\n");
+        stopWatch.stop();
+        builder.append("> JNI execution time: ").append(stopWatch.getDuration()).append(" ms\n");
 
         return builder.toString();
     }
 
-    public static String javaEraseDirectoryRecursive(@NonNull Context context) {
-        final var builder = new StringBuilder();
-        final long beginTime = System.currentTimeMillis();
+    public String javaEraseDirectoryRecursive(@NonNull Context context) {
+        stopWatch.reset();
+        stopWatch.start();
 
-        builder.append("\nStart deleting directory recursive\n");
+        final var builder = new StringBuilder();
+        builder.append("\nStart Java deleting directory recursive\n");
 
         final var directory = createDirectory(context, builder);
         final String directoryPath = directory.getPath();
@@ -173,17 +237,18 @@ public final class FileManager {
         builder.append("> Delete directory recursive").append(directoryPath).append("\n");
         deleteDirectoryRecursive(directory, builder);
 
-        final long endTime = System.currentTimeMillis();
-        builder.append("> Java execution time: ").append(endTime - beginTime).append(" ms\n");
+        stopWatch.stop();
+        builder.append("> Java execution time: ").append(stopWatch.getDuration()).append(" ms\n");
 
         return builder.toString();
     }
 
-    public static String cppEraseDirectoryRecursive(@NonNull Context context) {
-        final var builder = new StringBuilder();
-        final long beginTime = System.currentTimeMillis();
+    public String cppEraseDirectoryRecursive(@NonNull Context context) {
+        stopWatch.reset();
+        stopWatch.start();
 
-        builder.append("\nStart native erasing directory recursive\n");
+        final var builder = new StringBuilder();
+        builder.append("\nStart C++ erasing directory recursive\n");
 
         final var directory = createDirectory(context, builder);
         final String directoryPath = directory.getPath();
@@ -197,7 +262,7 @@ public final class FileManager {
         try {
             builder.append("> Erase directory recursive").append(directoryPath).append("\n");
 
-            final long duration = FileManager.eraseDirectory(directoryPath, true);
+            final long duration = eraseDirectory(directoryPath, true);
 
             builder.append("> C++ execution time: ").append(duration).append(" ms\n");
         } catch (FileException e) {
@@ -205,14 +270,14 @@ public final class FileManager {
                    .append(" exception").append(e.getMessage()).append("\n");
         }
 
-        final long endTime = System.currentTimeMillis();
-        builder.append("> JNI execution time: ").append(endTime - beginTime).append(" ms\n");
+        stopWatch.stop();
+        builder.append("> JNI execution time: ").append(stopWatch.getDuration()).append(" ms\n");
 
         return builder.toString();
     }
 
 
-    private static File createDirectory(@NonNull Context context, @NonNull StringBuilder builder) {
+    private File createDirectory(@NonNull Context context, @NonNull StringBuilder builder) {
         final var directory = new File(context.getFilesDir(), ERASE_DIRECTORY);
 
         if (!directory.exists()) {
@@ -224,8 +289,8 @@ public final class FileManager {
         return directory;
     }
 
-    private static void fillFile(@NonNull File file, @NonNull String text,
-                                 @NonNull StringBuilder builder) {
+    private void fillFile(@NonNull File file, @NonNull String text,
+                          @NonNull StringBuilder builder) {
         try {
             final var writer = new FileWriter(file);
 
@@ -241,7 +306,7 @@ public final class FileManager {
         }
     }
 
-    private static void deleteDirectory(@NonNull File directory, @NonNull StringBuilder builder) {
+    private void deleteDirectory(@NonNull File directory, @NonNull StringBuilder builder) {
         if (!directory.isDirectory()) {
             return;
         }
@@ -266,7 +331,7 @@ public final class FileManager {
         }
     }
 
-    private static void deleteDirectoryRecursive(@NonNull File fileOrDirectory, @NonNull StringBuilder builder) {
+    private void deleteDirectoryRecursive(@NonNull File fileOrDirectory, @NonNull StringBuilder builder) {
         final File[] children = fileOrDirectory.listFiles();
 
         if (children != null) {

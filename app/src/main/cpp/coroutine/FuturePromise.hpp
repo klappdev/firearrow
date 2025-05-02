@@ -23,17 +23,17 @@
  */
 #pragma once
 
-#include <experimental/coroutine>
+#include <coroutine>
 #include <future>
 
 template<typename R, typename... Args>
-struct std::experimental::coroutine_traits<std::future<R>, Args...> {
+struct std::coroutine_traits<std::future<R>, Args...> {
     struct promise_type {
     public:
         auto get_return_object() /*customisable*/ { return offer.get_future(); }
 
-        std::experimental::suspend_never initial_suspend() const noexcept /*customisable*/ { return {}; }
-        std::experimental::suspend_never final_suspend() const noexcept /*customisable*/ { return {}; }
+        std::suspend_never initial_suspend() const noexcept /*customisable*/ { return {}; }
+        std::suspend_never final_suspend() const noexcept /*customisable*/ { return {}; }
 
         void set_exception(std::exception_ptr error) {
             offer.set_exception(std::move(error));
@@ -53,13 +53,13 @@ struct std::experimental::coroutine_traits<std::future<R>, Args...> {
 };
 
 template<typename... Args>
-struct std::experimental::coroutine_traits<std::future<void>, Args...> {
+struct std::coroutine_traits<std::future<void>, Args...> {
     struct promise_type {
     public:
         auto get_return_object() /*customisable*/ { return offer.get_future(); }
 
-        std::experimental::suspend_never initial_suspend() const noexcept /*customisable*/ { return {}; }
-        std::experimental::suspend_never final_suspend() const noexcept /*customisable*/ { return {}; }
+        std::suspend_never initial_suspend() const noexcept /*customisable*/ { return {}; }
+        std::suspend_never final_suspend() const noexcept /*customisable*/ { return {}; }
 
         void set_exception(std::exception_ptr e) {
             offer.set_exception(std::move(e));

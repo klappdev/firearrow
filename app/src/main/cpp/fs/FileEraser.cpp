@@ -1,7 +1,7 @@
 /*
  * Licensed under the MIT License <http://opensource.org/licenses/MIT>.
  * SPDX-License-Identifier: MIT
- * Copyright (c) 2022 https://github.com/klappdev
+ * Copyright (c) 2022-2025 https://github.com/klappdev
  *
  * Permission is hereby  granted, free of charge, to any  person obtaining a copy
  * of this software and associated  documentation files (the "Software"), to deal
@@ -29,20 +29,17 @@
 
 #include "FileUnit.hpp"
 #include <logging/Logging.hpp>
-#include <util/strings/StringUtil.hpp>
+#include <strings/StringUtil.hpp>
 
-namespace kl::fs {
-    using fs::literals::operator""_kb;
-    using fs::literals::operator""_gb;
+#define FILE_ERASER_DEBUG 0
 
-    using namespace kl::util::strings;
+namespace firearrow::fs {
+    using fs_literals::operator""_kb;
+    using fs_literals::operator""_gb;
+
+    using namespace strings;
 
     static constexpr const char* TAG = "FileEraser-JNI";
-
-    FileEraser& FileEraser::instance() {
-        static FileEraser eraser;
-        return eraser;
-    }
 
     Result<void, FileError> FileEraser::init(const std::filesystem::path& newPath, OverwriteMode newMode) {
         this->path = newPath;
@@ -207,7 +204,7 @@ namespace kl::fs {
 
         this->buffer = std::make_unique<uint8_t[]>(bufferSize);
         std::memset(buffer.get(), byte, bufferSize);
-#if 0
+#if FILE_ERASER_DEBUG
         for (std::size_t i = 0; i < bufferSize; ++i) {
             log::info(TAG, "buffer[%d] = %d", i, std::uint32_t(buffer[i]));
         }
@@ -228,7 +225,7 @@ namespace kl::fs {
         buffer = std::make_unique<uint8_t[]>(bufferSize);
 
         std::copy(randomData.begin(), randomData.end(), buffer.get());
-#if 0
+#if FILE_ERASER_DEBUG
         for (std::size_t i = 0; i < bufferSize; ++i) {
             log::info(TAG, "buffer[%d] = %d", i, std::uint32_t(buffer[i]));
         }
@@ -250,7 +247,7 @@ namespace kl::fs {
 
         std::size_t written = 0;
         std::string errorMessage;
-#if 0
+#if FILE_ERASER_DEBUG
         log::debug(TAG, "Overwrite [buffer size=%d, file size=%" PRId64 ", count=%zu, tail=%zu, pass=%d]",
                    bufferSize, fileSize, count, tail, pass);
 #endif

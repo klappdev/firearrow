@@ -1,7 +1,7 @@
 /*
  * Licensed under the MIT License <http://opensource.org/licenses/MIT>.
  * SPDX-License-Identifier: MIT
- * Copyright (c) 2022 https://github.com/klappdev
+ * Copyright (c) 2022-2025 https://github.com/klappdev
  *
  * Permission is hereby  granted, free of charge, to any  person obtaining a copy
  * of this software and associated  documentation files (the "Software"), to deal
@@ -24,9 +24,9 @@
 
 #include "BacktraceFrame.hpp"
 
-#include <util/strings/StringUtil.hpp>
+#include <strings/StringUtil.hpp>
 
-namespace kl::backtrace {
+namespace firearrow::backtrace {
     BacktraceFrame::BacktraceFrame()
         : absoluteAddress(0)
         , offset(0) {
@@ -50,16 +50,14 @@ namespace kl::backtrace {
     }
 
     std::string toString(const BacktraceFrame& frame) {
-        using kl::util::strings::format;
-
         const auto& [fileName, functionName, address, offset] = frame;
 
         if (fileName.empty()) {
-            return format("[at %p]", address);
+            return strings::format("[at %p]", address);
         } else if (!functionName.empty()) {
-            return format("[at %s:%p (%s+0x%x)]", fileName.c_str(), address, functionName.c_str(), (int32_t)offset);
+            return strings::format("[at %s:%p (%s+0x%x)]", fileName.c_str(), address, functionName.c_str(), (int32_t)offset);
         } else {
-            return format("[at %s:%p]", fileName.c_str(), address);
+            return strings::format("[at %s:%p]", fileName.c_str(), address);
         }
     }
 }

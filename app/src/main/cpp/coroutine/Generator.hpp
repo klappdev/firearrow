@@ -1,7 +1,7 @@
 /*
  * Licensed under the MIT License <http://opensource.org/licenses/MIT>.
  * SPDX-License-Identifier: MIT
- * Copyright (c) 2022 https://github.com/klappdev
+ * Copyright (c) 2022-2025 https://github.com/klappdev
  *
  * Permission is hereby  granted, free of charge, to any  person obtaining a copy
  * of this software and associated  documentation files (the "Software"), to deal
@@ -24,12 +24,12 @@
 
 #pragma once
 
-#include <experimental/coroutine>
+#include <coroutine>
 
-#include <util/nullability/Nullable.hpp>
+#include <nullability/Nullable.hpp>
 
-namespace kl::coroutine {
-    using namespace kl::util::nullability;
+namespace firearrow::coroutine {
+    using namespace nullability;
 
     template<typename T>
     class Generator;
@@ -43,17 +43,17 @@ namespace kl::coroutine {
 
         Generator<T> get_return_object() noexcept /*customisable*/;
 
-        constexpr std::experimental::suspend_always initial_suspend() const noexcept /*customisable*/ { return {}; }
-        constexpr std::experimental::suspend_always final_suspend() const noexcept /*customisable*/ { return {}; }
+        constexpr std::suspend_always initial_suspend() const noexcept /*customisable*/ { return {}; }
+        constexpr std::suspend_always final_suspend() const noexcept /*customisable*/ { return {}; }
 
         template<typename U = T,
                  typename std::enable_if_t<!std::is_rvalue_reference_v<U>>>
-        std::experimental::suspend_always yield_value(std::remove_reference_t<T>& data) noexcept /*customisable*/ {
+        std::suspend_always yield_value(std::remove_reference_t<T>& data) noexcept /*customisable*/ {
             this->value = std::addressof(data);
             return {};
         }
 
-        std::experimental::suspend_always yield_value(std::remove_reference_t<T>&& data) noexcept /*customisable*/ {
+        std::suspend_always yield_value(std::remove_reference_t<T>&& data) noexcept /*customisable*/ {
             this->value = std::addressof(data);
             return {};
         }
@@ -76,7 +76,7 @@ namespace kl::coroutine {
 
     template<typename T>
     Generator<T> GeneratorPromise<T>::get_return_object() noexcept {
-        using handle = std::experimental::coroutine_handle<GeneratorPromise<T>>;
+        using handle = std::coroutine_handle<GeneratorPromise<T>>;
         return Generator<T>{ handle::from_promise(*this) };
     }
 
@@ -87,7 +87,7 @@ namespace kl::coroutine {
     public:
         GeneratorIterator() noexcept : continuation(nullptr) {}
 
-        explicit GeneratorIterator(std::experimental::coroutine_handle<GeneratorPromise<T>> coroutine) noexcept
+        explicit GeneratorIterator(std::coroutine_handle<GeneratorPromise<T>> coroutine) noexcept
             : continuation(coroutine) {
         }
 
@@ -119,7 +119,7 @@ namespace kl::coroutine {
             return std::addressof(operator*());
         }
     private:
-        std::experimental::coroutine_handle<GeneratorPromise<T>> continuation;
+        std::coroutine_handle<GeneratorPromise<T>> continuation;
     };
 
     template<typename T>
@@ -159,10 +159,10 @@ namespace kl::coroutine {
     private:
         friend class GeneratorPromise<T>;
 
-        explicit Generator(std::experimental::coroutine_handle<promise_type> coroutine) noexcept
+        explicit Generator(std::coroutine_handle<promise_type> coroutine) noexcept
             : continuation(coroutine) {
         }
 
-        std::experimental::coroutine_handle<promise_type> continuation;
+        std::coroutine_handle<promise_type> continuation;
     };
 }

@@ -24,11 +24,10 @@
 
 #pragma once
 
-#include <util/strings/NameOf.hpp>
-#include <util/strings/StringUtil.hpp>
+#include <strings/NameOf.hpp>
+#include <strings/StringUtil.hpp>
 
-namespace kl::jni {
-    using namespace kl::util::strings;
+namespace firearrow::jni {
 
     void jvmThrowException(const std::string& message);
 
@@ -36,7 +35,7 @@ namespace kl::jni {
     void jvmThrowNullPointerException(const char* message) {
         if (!message) return;
 
-        std::string reason = format("(%s) %s", std::string(nameof<T>()).c_str(), message);
+        std::string reason = strings::format("(%s) %s", std::string(strings::nameof<T>()).c_str(), message);
         jvmThrowException(reason);
     }
 }

@@ -1,7 +1,7 @@
 /*
  * Licensed under the MIT License <http://opensource.org/licenses/MIT>.
  * SPDX-License-Identifier: MIT
- * Copyright (c) 2022 https://github.com/klappdev
+ * Copyright (c) 2022-2025 https://github.com/klappdev
  *
  * Permission is hereby  granted, free of charge, to any  person obtaining a copy
  * of this software and associated  documentation files (the "Software"), to deal
@@ -31,18 +31,15 @@
 #include "FileUtil.hpp"
 #include "FileError.hpp"
 
-#include <util/error/Result.hpp>
+#include <error/Result.hpp>
 
-namespace kl::fs {
-    using namespace kl::util::error;
+namespace firearrow::fs {
+    using namespace error;
 
     class FileEraser final {
-    private:
+    public:
         FileEraser() = default;
         ~FileEraser() = default;
-
-    public:
-        static FileEraser& instance();
 
         Result<void, FileError> init(const std::filesystem::path& path, OverwriteMode newMode);
 

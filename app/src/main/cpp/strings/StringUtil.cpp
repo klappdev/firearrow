@@ -1,7 +1,7 @@
 /*
  * Licensed under the MIT License <http://opensource.org/licenses/MIT>.
  * SPDX-License-Identifier: MIT
- * Copyright (c) 2022 https://github.com/klappdev
+ * Copyright (c) 2022-2025 https://github.com/klappdev
  *
  * Permission is hereby  granted, free of charge, to any  person obtaining a copy
  * of this software and associated  documentation files (the "Software"), to deal
@@ -22,20 +22,31 @@
  * SOFTWARE.
  */
 
-#pragma once
+#include "StringUtil.hpp"
 
-#include <array>
+#include <string>
+#include <random>
 
-namespace kl::util::arrays {
+namespace firearrow::strings {
 
-    template<typename T, std::size_t N, std::size_t... Ns>
-    static constexpr std::array<T, N> makeArrayImpl(std::initializer_list<T> list, std::index_sequence<Ns...>) {
-        return std::array<T, N>{ *(list.begin() + Ns)... };
+    static constexpr char CHARACTERS[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+
+    std::string randomBuffer(std::size_t length) {
+        std::random_device randomDevice;
+        std::mt19937 generator(randomDevice());
+        std::uniform_int_distribution<> distribution(0, std::ssize(CHARACTERS) - 1);
+
+        std::string result;
+
+        for (std::size_t i = 0; i < length; ++i) {
+            result += CHARACTERS[distribution(generator)];
+        }
+
+        return result;
     }
 
-    template<typename T, std::size_t N>
-    constexpr std::array<T, N> makeArray(std::initializer_list<T> list) {
-        //assert(N > list.size());
-        return makeArrayImpl<T, N>(list, std::make_index_sequence<N>());
+    bool contains(const std::string& input, const std::string& substring) {
+        return input.find(substring) != std::string::npos;
     }
 }
+

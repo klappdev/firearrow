@@ -1,7 +1,7 @@
 /*
  * Licensed under the MIT License <http://opensource.org/licenses/MIT>.
  * SPDX-License-Identifier: MIT
- * Copyright (c) 2022 https://github.com/klappdev
+ * Copyright (c) 2022-2025 https://github.com/klappdev
  *
  * Permission is hereby  granted, free of charge, to any  person obtaining a copy
  * of this software and associated  documentation files (the "Software"), to deal
@@ -24,14 +24,14 @@
 
 #include "Backtrace.hpp"
 
-#include <util/strings/StringUtil.hpp>
+#include <strings/StringUtil.hpp>
 #include <logging/Logging.hpp>
 
 #include <unwind.h>
 #include <cxxabi.h>
 #include <dlfcn.h>
 
-namespace kl::backtrace {
+namespace firearrow::backtrace {
     static constexpr const char* const TAG = "Backtrace-JNI";
 
     Backtrace::Backtrace()
@@ -137,7 +137,7 @@ namespace kl::backtrace {
     bool Backtrace::isSharedLibrary(const char *name) {
         if (name == nullptr) return false;
 
-        return util::strings::contains(name, ".so");
+        return strings::contains(name, ".so");
     }
 
     std::string toString(const Backtrace& backtrace) {

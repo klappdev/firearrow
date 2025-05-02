@@ -1,7 +1,7 @@
 /*
  * Licensed under the MIT License <http://opensource.org/licenses/MIT>.
  * SPDX-License-Identifier: MIT
- * Copyright (c) 2022 https://github.com/klappdev
+ * Copyright (c) 2022-2025 https://github.com/klappdev
  *
  * Permission is hereby  granted, free of charge, to any  person obtaining a copy
  * of this software and associated  documentation files (the "Software"), to deal
@@ -23,9 +23,9 @@
  */
 #pragma once
 
-#include <util/enumeration/Enumeration.hpp>
+#include <enumeration/Enumeration.hpp>
 
-namespace kl::fs {
+namespace firearrow::fs {
 
     enum class OverwriteMode : std::uint8_t {
         SIMPLE_MODE  = 1,
@@ -33,7 +33,7 @@ namespace kl::fs {
         DOD_MODE     = 7
     };
 
-    inline constexpr util::enumeration::Enumeration<OverwriteMode, 3> OVERWRITE_MODE = {
+    inline constexpr enumeration::Enumeration<OverwriteMode, 3> OVERWRITE_MODE = {
         {OverwriteMode::SIMPLE_MODE, "SIMPLE_MODE"},
         {OverwriteMode::OPENBSD_MODE, "OPENBSD_MODE"},
         {OverwriteMode::DOD_MODE, "DOD_MODE"}

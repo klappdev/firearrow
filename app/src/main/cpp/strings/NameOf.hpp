@@ -21,34 +21,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE  OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+#pragma once
 
-#include "UniqueUtfChars.hpp"
+#include <string_view>
 
-#include <cstring>
+namespace firearrow::strings {
 
-namespace firearrow::jni {
+    template<typename T>
+    constexpr auto nameof() {
+        std::string_view name = __PRETTY_FUNCTION__;
+        std::string_view prefix = "auto kl::util::strings::nameof() [T = ";
+        std::string_view suffix = "]";
 
-    UniqueUtfChars::UniqueUtfChars(JNIEnv* env, jstring jvmString)
-        : env(env), jvmString(jvmString) {
+        name.remove_prefix(prefix.size());
+        name.remove_suffix(suffix.size());
 
-        if (jvmString != nullptr) {
-            rawChars = env->GetStringUTFChars(jvmString, nullptr);
-        } else {
-            rawChars = nullptr;
-        }
-    }
-
-    UniqueUtfChars::~UniqueUtfChars() {
-        if (rawChars != nullptr) {
-            env->ReleaseStringUTFChars(jvmString, rawChars);
-        }
-    }
-
-    const Nullable<const char*>& UniqueUtfChars::get() const {
-        return rawChars;
-    }
-
-    std::size_t UniqueUtfChars::size() const {
-        return rawChars != nullptr ? std::strlen(rawChars) : 0;
+        return name;
     }
 }

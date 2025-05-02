@@ -1,7 +1,7 @@
 /*
  * Licensed under the MIT License <http://opensource.org/licenses/MIT>.
  * SPDX-License-Identifier: MIT
- * Copyright (c) 2022 https://github.com/klappdev
+ * Copyright (c) 2022-2025 https://github.com/klappdev
  *
  * Permission is hereby  granted, free of charge, to any  person obtaining a copy
  * of this software and associated  documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@
  */
 #pragma once
 
-namespace kl::fs::literals {
+namespace firearrow::fs_literals {
 
     inline constexpr unsigned long long int operator""_kb(unsigned long long int value) {
         return 1024ull * value;

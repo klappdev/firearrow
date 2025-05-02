@@ -1,7 +1,7 @@
 /*
  * Licensed under the MIT License <http://opensource.org/licenses/MIT>.
  * SPDX-License-Identifier: MIT
- * Copyright (c) 2022 https://github.com/klappdev
+ * Copyright (c) 2022-2025 https://github.com/klappdev
  *
  * Permission is hereby  granted, free of charge, to any  person obtaining a copy
  * of this software and associated  documentation files (the "Software"), to deal
@@ -21,32 +21,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE  OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
-#include "StringUtil.hpp"
+#pragma once
 
 #include <string>
-#include <random>
 
-namespace kl::util::strings {
+namespace firearrow::strings {
 
-    static constexpr char CHARACTERS[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    std::string randomBuffer(std::size_t length);
 
-    std::string randomBuffer(std::size_t length) {
-        std::random_device randomDevice;
-        std::mt19937 generator(randomDevice());
-        std::uniform_int_distribution<> distribution(0, std::ssize(CHARACTERS) - 1);
+    bool contains(const std::string& input, const std::string& substring);
 
-        std::string result;
+    template<typename... Args>
+    std::string format(const char* formatter, Args... arguments) {
+        int formatterSize = std::sprintf(nullptr, 0, formatter, arguments...) + 1; // extra for '\0'
+        if (formatterSize <= 0) return "";
 
-        for (std::size_t i = 0; i < length; ++i) {
-            result += CHARACTERS[distribution(generator)];
-        }
+        std::size_t size = static_cast<std::size_t>(formatterSize);
+        auto buffer = std::make_unique<char[]>(size);
+        std::snprintf(buffer.get(), size, formatter, arguments...);
 
-        return result;
-    }
-
-    bool contains(const std::string& input, const std::string& substring) {
-        return input.find(substring) != std::string::npos;
+        return std::string(buffer.get(), buffer.get() + size - 1); // don't need '\0' inside
     }
 }
-

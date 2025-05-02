@@ -1,7 +1,7 @@
 /*
  * Licensed under the MIT License <http://opensource.org/licenses/MIT>.
  * SPDX-License-Identifier: MIT
- * Copyright (c) 2022 https://github.com/klappdev
+ * Copyright (c) 2022-2025 https://github.com/klappdev
  *
  * Permission is hereby  granted, free of charge, to any  person obtaining a copy
  * of this software and associated  documentation files (the "Software"), to deal
@@ -21,25 +21,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE  OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#pragma once
 
-#include <string>
+#include <vector>
 
-namespace kl::util::strings {
+#include "NetworkError.hpp"
+#include <error/Result.hpp>
 
-    std::string randomBuffer(std::size_t length);
+namespace firearrow::net {
+    using namespace error;
 
-    bool contains(const std::string& input, const std::string& substring);
+    class HttpClient final {
+    public:
+        HttpClient();
+        ~HttpClient();
 
-    template<typename... Args>
-    std::string format(const char* formatter, Args... arguments) {
-        int formatterSize = std::sprintf(nullptr, 0, formatter, arguments...) + 1; // extra for '\0'
-        if (formatterSize <= 0) return "";
+        Result<std::uint32_t, NetworkError> create(const std::string& address, std::uint16_t port);
+        Result<void, NetworkError> connect();
+        void disconnect();
 
-        std::size_t size = static_cast<std::size_t>(formatterSize);
-        auto buffer = std::make_unique<char[]>(size);
-        std::snprintf(buffer.get(), size, formatter, arguments...);
+        [[nodiscard]] bool isOpened() const;
 
-        return std::string(buffer.get(), buffer.get() + size - 1); // don't need '\0' inside
-    }
+        Result<std::int64_t, NetworkError> send();
+        Result<std::vector<std::string>, NetworkError> receive() const;
+
+    private:
+        std::int32_t fd;
+        std::string address;
+        std::uint16_t port;
+        std::string request;
+    };
 }

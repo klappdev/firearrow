@@ -1,7 +1,7 @@
 /*
  * Licensed under the MIT License <http://opensource.org/licenses/MIT>.
  * SPDX-License-Identifier: MIT
- * Copyright (c) 2022 https://github.com/klappdev
+ * Copyright (c) 2022-2025 https://github.com/klappdev
  *
  * Permission is hereby  granted, free of charge, to any  person obtaining a copy
  * of this software and associated  documentation files (the "Software"), to deal
@@ -25,15 +25,14 @@
 
 #include <jni.h>
 
-#include <util/nullability/NonNull.hpp>
-#include <util/nullability/Nullable.hpp>
+#include <nullability/Nullable.hpp>
 
-namespace kl::jni {
-    using namespace kl::util::nullability;
+namespace firearrow::jni {
+    using namespace nullability;
 
     class UniqueUtfChars final {
     public:
-        UniqueUtfChars(const NonNull<JNIEnv*>& env, jstring jvmString);
+        UniqueUtfChars(JNIEnv* env, jstring jvmString);
         ~UniqueUtfChars();
 
         UniqueUtfChars(const UniqueUtfChars&) = delete;
@@ -43,7 +42,7 @@ namespace kl::jni {
         std::size_t size() const;
 
     private:
-        NonNull<JNIEnv*> env;
+        JNIEnv* env;
         Nullable<const char*> rawChars;
         jstring jvmString;
     };

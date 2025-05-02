@@ -1,7 +1,7 @@
 /*
  * Licensed under the MIT License <http://opensource.org/licenses/MIT>.
  * SPDX-License-Identifier: MIT
- * Copyright (c) 2022 https://github.com/klappdev
+ * Copyright (c) 2022-2025 https://github.com/klappdev
  *
  * Permission is hereby  granted, free of charge, to any  person obtaining a copy
  * of this software and associated  documentation files (the "Software"), to deal
@@ -46,33 +46,33 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* jvm, [[maybe_unused]] void*
     globalJavaVm = jvm;
 
     if (jvm->GetEnv(reinterpret_cast<void**>(&env), JNI_DEFAULT_VERSION) != JNI_OK) {
-        kl::log::error(TAG, "Could not get JNIEnv");
+        firearrow::log::error(TAG, "Could not get JNIEnv");
         return JNI_ERR;
     }
 
     registerJniExceptions(env);
 
     if (registerFileManager(env) != 0) {
-        kl::log::error(TAG, "Could not register file manager");
+        firearrow::log::error(TAG, "Could not register file manager");
         return JNI_ERR;
     }
 
     if (registerCoroutineManager(env) != 0) {
-        kl::log::error(TAG, "Could not register coroutine manager");
+        firearrow::log::error(TAG, "Could not register coroutine manager");
         return JNI_ERR;
     }
 
     if (registerSimdManager(env) != 0) {
-        kl::log::error(TAG, "Could not register simd manager");
+        firearrow::log::error(TAG, "Could not register simd manager");
         return JNI_ERR;
     }
 
     if (registerNetworkManager(env) != 0) {
-        kl::log::error(TAG, "Could not register network manager");
+        firearrow::log::error(TAG, "Could not register network manager");
         return JNI_ERR;
     }
 
-    kl::log::info(TAG, "Load jni library");
+    firearrow::log::info(TAG, "Load jni library");
 
     return JNI_DEFAULT_VERSION;
 }
@@ -81,7 +81,7 @@ extern "C" JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *jvm, [[maybe_unused]] voi
     JNIEnv* env = nullptr;
 
     if (jvm->GetEnv(reinterpret_cast<void**>(&env), JNI_DEFAULT_VERSION)) {
-        kl::log::error(TAG, "Could not unregister jni components");
+        firearrow::log::error(TAG, "Could not unregister jni components");
         return;
     }
 
@@ -91,5 +91,5 @@ extern "C" JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *jvm, [[maybe_unused]] voi
     unregisterSimdManager(env);
     unregisterNetworkManager(env);
 
-    kl::log::info(TAG, "Unload jni library");
+    firearrow::log::info(TAG, "Unload jni library");
 }

@@ -1,7 +1,7 @@
 /*
  * Licensed under the MIT License <http://opensource.org/licenses/MIT>.
  * SPDX-License-Identifier: MIT
- * Copyright (c) 2022 https://github.com/klappdev
+ * Copyright (c) 2022-2025 https://github.com/klappdev
  *
  * Permission is hereby  granted, free of charge, to any  person obtaining a copy
  * of this software and associated  documentation files (the "Software"), to deal
@@ -24,12 +24,12 @@
 
 #pragma once
 
-#include <experimental/coroutine>
+#include <coroutine>
 
-#include <util/property/Getter.hpp>
+#include <property/Getter.hpp>
 
-namespace kl::coroutine {
-    using namespace kl::util::property;
+namespace firearrow::coroutine {
+    using namespace property;
 
     template<typename T>
     class Task final {
@@ -46,7 +46,7 @@ namespace kl::coroutine {
 
         bool await_ready() const /*customisable*/ { return false; }
         void await_resume() /*customisable*/ {}
-        void await_suspend(std::experimental::coroutine_handle<> handler) /*customisable*/ {
+        void await_suspend(std::coroutine_handle<> handler) /*customisable*/ {
             value_ = callback();
 
             if (!handler.done()) {
@@ -77,7 +77,7 @@ namespace kl::coroutine {
 
         bool await_ready() const /*customisable*/ { return false; }
         void await_resume() /*customisable*/ {}
-        void await_suspend(std::experimental::coroutine_handle<> handler) /*customisable*/ {
+        void await_suspend(std::coroutine_handle<> handler) /*customisable*/ {
             callback();
 
             if (!handler.done()) {

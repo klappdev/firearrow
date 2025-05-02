@@ -1,7 +1,7 @@
 /*
  * Licensed under the MIT License <http://opensource.org/licenses/MIT>.
  * SPDX-License-Identifier: MIT
- * Copyright (c) 2022 https://github.com/klappdev
+ * Copyright (c) 2022-2025 https://github.com/klappdev
  *
  * Permission is hereby  granted, free of charge, to any  person obtaining a copy
  * of this software and associated  documentation files (the "Software"), to deal
@@ -25,12 +25,12 @@
 
 #include <string>
 
-#include <util/strings/StringUtil.hpp>
-#include <util/property/Getter.hpp>
+#include <strings/StringUtil.hpp>
+#include <property/Getter.hpp>
 
-namespace kl::fs {
-    using namespace kl::util::strings;
-    using namespace kl::util::property;
+namespace firearrow::fs {
+    using namespace strings;
+    using namespace property;
 
     class FileError final {
     public:

@@ -84,42 +84,57 @@
   {
     "id": 17,
     "idCategory" : 3,
-    "name" : "Java: Calculate summary two sequence numbers"
+    "name" : "Java: Calculate addition two integer arrays"
   },
   {
     "id": 18,
     "idCategory" : 3,
-    "name" : "C++: Calculate summary two sequence numbers"
+    "name" : "C++: Calculate addition two sequence numbers using simd/neon"
   },
   {
     "id": 19,
     "idCategory" : 3,
-    "name" : "Java: Calculate summary two sequence numbers using stream api"
+    "name" : "C++: Calculate addition two sequence numbers using fast simd/neon"
   },
   {
     "id": 20,
     "idCategory" : 3,
-    "name" : "C++: Calculate summary two sequence numbers using simd api"
+    "name" : "Java: Calculate subtract two sequence numbers"
   },
-
   {
     "id": 21,
-    "idCategory" : 4,
-    "name" : "Java: Perform network GET request"
+    "idCategory" : 3,
+    "name" : "C++: Calculate subtract two sequence numbers using simd/neon"
   },
   {
     "id": 22,
-    "idCategory" : 4,
-    "name" : "C++: Perform network GET request"
+    "idCategory" : 3,
+    "name" : "C++: Calculate subtract two sequence numbers using fast simd/neon"
   },
   {
     "id": 23,
-    "idCategory" : 4,
-    "name" : "Java: Perform async network GET request"
+    "idCategory" : 3,
+    "name" : "C++: Check simd abi is supported"
   },
+
   {
     "id": 24,
     "idCategory" : 4,
-    "name" : "C++: Perform async network GET request"
+    "name" : "Java: Perform network HTTP request"
+  },
+  {
+    "id": 25,
+    "idCategory" : 4,
+    "name" : "C++: Perform network HTTP request"
+  },
+  {
+    "id": 26,
+    "idCategory" : 4,
+    "name" : "Java: Perform async network HTTP request"
+  },
+  {
+    "id": 27,
+    "idCategory" : 4,
+    "name" : "C++: Perform async network HTTP request"
   }
 ]

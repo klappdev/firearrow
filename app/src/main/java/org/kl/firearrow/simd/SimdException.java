@@ -1,7 +1,7 @@
 /*
  * Licensed under the MIT License <http://opensource.org/licenses/MIT>.
  * SPDX-License-Identifier: MIT
- * Copyright (c) 2022 https://github.com/klappdev
+ * Copyright (c) 2025 https://github.com/klappdev
  *
  * Permission is hereby  granted, free of charge, to any  person obtaining a copy
  * of this software and associated  documentation files (the "Software"), to deal
@@ -21,21 +21,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE  OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#pragma once
+package org.kl.firearrow.simd;
 
-#include <string_view>
+import java.io.Serial;
 
-namespace kl::util::strings {
+public final class SimdException extends Exception {
+    @Serial
+    private static final long serialVersionUID = 1L;
+    private final String message;
 
-    template<typename T>
-    constexpr auto nameof() {
-        std::string_view name = __PRETTY_FUNCTION__;
-        std::string_view prefix = "auto kl::util::strings::nameof() [T = ";
-        std::string_view suffix = "]";
+    public SimdException(String message) {
+        super();
+        this.message = message;
+    }
 
-        name.remove_prefix(prefix.size());
-        name.remove_suffix(suffix.size());
-
-        return name;
+    @Override
+    public String getMessage() {
+        return message;
     }
 }

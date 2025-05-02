@@ -1,7 +1,7 @@
 /*
  * Licensed under the MIT License <http://opensource.org/licenses/MIT>.
  * SPDX-License-Identifier: MIT
- * Copyright (c) 2022 https://github.com/klappdev
+ * Copyright (c) 2022-2025 https://github.com/klappdev
  *
  * Permission is hereby  granted, free of charge, to any  person obtaining a copy
  * of this software and associated  documentation files (the "Software"), to deal
@@ -23,12 +23,10 @@
  */
 package org.kl.firearrow.ui.feature;
 
-import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.paging.PagingDataAdapter;
 
 import lombok.Setter;
@@ -44,7 +42,7 @@ public final class FeatureAdapter extends PagingDataAdapter<Feature, FeatureView
 
     private final FeatureActivity activity;
 
-    public FeatureAdapter(FeatureActivity activity) {
+    public FeatureAdapter(@NonNull FeatureActivity activity) {
         super(new FeatureDifferenceCallback());
 
         this.activity = activity;
@@ -60,13 +58,16 @@ public final class FeatureAdapter extends PagingDataAdapter<Feature, FeatureView
     }
 
     @Override
-    @RequiresApi(api = Build.VERSION_CODES.R)
     public void onBindViewHolder(@NonNull FeatureViewHolder holder, int position) {
         final var feature = getItem(position);
 
         if (feature != null) {
+            final var listener = new ChooseFeatureListener(feature.getId(), activity.getDisposables(),
+                activity.getNetworkConnectivityHelper(), activity::showExecutionFeature
+            );
+
             holder.bind(feature);
-            holder.getBindingRoot().setOnClickListener(new ChooseFeatureListener(feature.getId(), activity));
+            holder.getBindingRoot().setOnClickListener(listener);
         }
     }
 

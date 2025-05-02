@@ -1,7 +1,7 @@
 /*
  * Licensed under the MIT License <http://opensource.org/licenses/MIT>.
  * SPDX-License-Identifier: MIT
- * Copyright (c) 2022-2023 https://github.com/klappdev
+ * Copyright (c) 2022-2025 https://github.com/klappdev
  *
  * Permission is hereby  granted, free of charge, to any  person obtaining a copy
  * of this software and associated  documentation files (the "Software"), to deal
@@ -23,8 +23,8 @@
  */
 package org.kl.firearrow.simd;
 
-public record SimdResult<E extends Number> (
-    E[] value,
+public record SimdResult (
+    int[] value,
     boolean isAbiSupported,
     long duration
 ) {}

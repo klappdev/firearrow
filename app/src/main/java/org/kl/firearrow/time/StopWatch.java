@@ -1,7 +1,7 @@
 /*
  * Licensed under the MIT License <http://opensource.org/licenses/MIT>.
  * SPDX-License-Identifier: MIT
- * Copyright (c) 2022 https://github.com/klappdev
+ * Copyright (c) 2025 https://github.com/klappdev
  *
  * Permission is hereby  granted, free of charge, to any  person obtaining a copy
  * of this software and associated  documentation files (the "Software"), to deal
@@ -22,21 +22,27 @@
  * SOFTWARE.
  */
 
-#pragma once
+package org.kl.firearrow.time;
 
-#include <util/enumeration/Enumeration.hpp>
+public final class StopWatch {
+    private long beginTime;
+    private long endTime;
 
-namespace kl::simd {
+    public StopWatch() {
+    }
 
-    enum class SimdAbi : std::uint8_t {
-        SIMD_128_BITS = 16,
-        SIMD_256_BITS = 32,
-        SIMD_512_BITS = 64
-    };
+    public void start() {
+        beginTime = System.currentTimeMillis();
+    }
+    public void stop() {
+        endTime = System.currentTimeMillis();
+    }
+    public void reset() {
+        beginTime = 0L;
+        endTime = 0L;
+    }
 
-    inline constexpr util::enumeration::Enumeration<SimdAbi, 3> SIMD_ABI = {
-        {SimdAbi::SIMD_128_BITS, "SIMD_128_BITS"},
-        {SimdAbi::SIMD_256_BITS, "SIMD_256_BITS"},
-        {SimdAbi::SIMD_512_BITS, "SIMD_512_BITS"}
-    };
+    public long getDuration() {
+        return endTime - beginTime;
+    }
 }

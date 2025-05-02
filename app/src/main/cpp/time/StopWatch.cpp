@@ -1,7 +1,7 @@
 /*
  * Licensed under the MIT License <http://opensource.org/licenses/MIT>.
  * SPDX-License-Identifier: MIT
- * Copyright (c) 2022-2025 https://github.com/klappdev
+ * Copyright (c) 2025 https://github.com/klappdev
  *
  * Permission is hereby  granted, free of charge, to any  person obtaining a copy
  * of this software and associated  documentation files (the "Software"), to deal
@@ -22,33 +22,35 @@
  * SOFTWARE.
  */
 
-#include "UniqueUtfChars.hpp"
+#include "StopWatch.hpp"
 
-#include <cstring>
+using namespace std::chrono_literals;
 
-namespace firearrow::jni {
+namespace firearrow::time {
 
-    UniqueUtfChars::UniqueUtfChars(JNIEnv* env, jstring jvmString)
-        : env(env), jvmString(jvmString) {
-
-        if (jvmString != nullptr) {
-            rawChars = env->GetStringUTFChars(jvmString, nullptr);
-        } else {
-            rawChars = nullptr;
-        }
+    StopWatch::StopWatch()
+        : beginTime()
+        , endTime() {
     }
 
-    UniqueUtfChars::~UniqueUtfChars() {
-        if (rawChars != nullptr) {
-            env->ReleaseStringUTFChars(jvmString, rawChars);
-        }
+    StopWatch::~StopWatch() {
+        reset();
     }
 
-    const Nullable<const char*>& UniqueUtfChars::get() const {
-        return rawChars;
+    void StopWatch::start() {
+        beginTime = std::chrono::steady_clock::now();
     }
 
-    std::size_t UniqueUtfChars::size() const {
-        return rawChars != nullptr ? std::strlen(rawChars) : 0;
+    void StopWatch::stop() {
+        endTime = std::chrono::steady_clock::now();
+    }
+
+    void StopWatch::reset() {
+        beginTime = std::chrono::steady_clock::now();
+        endTime = std::chrono::steady_clock::now();
+    }
+
+    uint64_t StopWatch::getDuration() const {
+        return std::chrono::duration_cast<std::chrono::milliseconds>(endTime - beginTime).count();
     }
 }

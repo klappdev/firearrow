@@ -1,7 +1,7 @@
 /*
  * Licensed under the MIT License <http://opensource.org/licenses/MIT>.
  * SPDX-License-Identifier: MIT
- * Copyright (c) 2022 https://github.com/klappdev
+ * Copyright (c) 2022-2025 https://github.com/klappdev
  *
  * Permission is hereby  granted, free of charge, to any  person obtaining a copy
  * of this software and associated  documentation files (the "Software"), to deal
@@ -30,6 +30,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
+import android.view.View;
 import android.widget.EditText;
 
 import javax.inject.Inject;
@@ -38,6 +39,7 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import lombok.Getter;
 
 import org.kl.firearrow.databinding.ActivityFeatureBinding;
+import org.kl.firearrow.net.NetworkConnectivityHelper;
 import org.kl.firearrow.viewmodel.FeatureListViewModel;
 
 @AndroidEntryPoint
@@ -46,6 +48,10 @@ public class FeatureActivity extends AppCompatActivity {
     @Inject
     @Getter
     public CompositeDisposable disposables;
+
+    @Inject
+    @Getter
+    public NetworkConnectivityHelper networkConnectivityHelper;
 
     private FeatureAdapter featureAdapter;
     private FeatureListViewModel featuresViewModel;
@@ -80,6 +86,8 @@ public class FeatureActivity extends AppCompatActivity {
     private void initView() {
         this.consoleTextEdit = binding.consoleEditText;
         this.featureRecyclerView = binding.featureRecyclerView;
+
+        binding.clearAllButton.setOnClickListener(view -> consoleTextEdit.setText(""));
 
         this.featureAdapter = new FeatureAdapter(this);
         featureRecyclerView.setAdapter(featureAdapter);

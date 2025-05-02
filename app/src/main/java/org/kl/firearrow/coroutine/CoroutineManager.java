@@ -34,22 +34,27 @@ import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.kl.firearrow.time.StopWatch;
+
 public final class CoroutineManager {
 
-    private CoroutineManager() throws IllegalAccessException {
-        throw new IllegalAccessException("Can't create instance");
+    private final StopWatch stopWatch;
+
+    public CoroutineManager() {
+        this.stopWatch = new StopWatch();
     }
 
-    public static native Task<Void> await(@NonNull Runnable runnable) throws CoroutineException;
-    public static native <T> Task<T> await(@NonNull Callable<T> caller) throws CoroutineException;
+    private static native Task<Void> await(@NonNull Runnable runnable) throws CoroutineException;
+    private static native <T> Task<T> await(@NonNull Callable<T> caller) throws CoroutineException;
 
-    public static native <T extends Number> Generator<T> yield(T initValue, int count) throws CoroutineException;
-    public static native <T extends Number> Generator<T> yield(T initValue, int begin, int end) throws CoroutineException;
+    private static native <T extends Number> Generator<T> yield(T initValue, int count) throws CoroutineException;
+    private static native <T extends Number> Generator<T> yield(T initValue, int begin, int end) throws CoroutineException;
 
-    public static String javaThreadRunnableOperation() {
-        final long beginTime = System.currentTimeMillis();
+    public String javaThreadRunnableOperation() {
+        stopWatch.reset();
+        stopWatch.start();
+
         final var builder = new StringBuilder();
-
         builder.append("\nStart Java thread sort array numbers\n");
 
         try {
@@ -75,16 +80,17 @@ public final class CoroutineManager {
             builder.append("> Thread exception: ").append(e.getMessage()).append("\n");
         }
 
-        final long endTime = System.currentTimeMillis();
-        builder.append("> Java execution time: ").append(endTime - beginTime).append(" ms\n");
+        stopWatch.stop();
+        builder.append("> Java execution time: ").append(stopWatch.getDuration()).append(" ms\n");
 
         return builder.toString();
     }
 
-    public static String cppCoroutineRunnableOperation() {
-        final long beginTime = System.currentTimeMillis();
-        final var builder = new StringBuilder();
+    public String cppCoroutineRunnableOperation() {
+        stopWatch.reset();
+        stopWatch.start();
 
+        final var builder = new StringBuilder();
         builder.append("\nStart C++ coroutine sort array numbers\n");
 
         try {
@@ -113,16 +119,17 @@ public final class CoroutineManager {
             builder.append("> Coroutine exception: ").append(e.getMessage()).append("\n");
         }
 
-        final long endTime = System.currentTimeMillis();
-        builder.append("> JNI execution time: ").append(endTime - beginTime).append(" ms\n");
+        stopWatch.stop();
+        builder.append("> JNI execution time: ").append(stopWatch.getDuration()).append(" ms\n");
 
         return builder.toString();
     }
 
-    public static String javaThreadCallableOperation() {
-        final long beginTime = System.currentTimeMillis();
-        final var builder = new StringBuilder();
+    public String javaThreadCallableOperation() {
+        stopWatch.reset();
+        stopWatch.start();
 
+        final var builder = new StringBuilder();
         builder.append("\nStart Java thread binary search in array numbers\n");
 
         try {
@@ -146,16 +153,17 @@ public final class CoroutineManager {
             builder.append("> Thread exception: ").append(e.getMessage()).append("\n");
         }
 
-        final long endTime = System.currentTimeMillis();
-        builder.append("> Java execution time: ").append(endTime - beginTime).append(" ms\n");
+        stopWatch.stop();
+        builder.append("> Java execution time: ").append(stopWatch.getDuration()).append(" ms\n");
 
         return builder.toString();
     }
 
-    public static String cppCoroutineCallableOperation() {
-        final long beginTime = System.currentTimeMillis();
-        final var builder = new StringBuilder();
+    public String cppCoroutineCallableOperation() {
+        stopWatch.reset();
+        stopWatch.start();
 
+        final var builder = new StringBuilder();
         builder.append("\nStart C++ thread binary search in array numbers\n");
 
         try {
@@ -178,18 +186,20 @@ public final class CoroutineManager {
             builder.append("> Generator exception: ").append(e.getMessage()).append("\n");
         }
 
-        final long endTime = System.currentTimeMillis();
-        builder.append("> JNI execution time: ").append(endTime - beginTime).append(" ms\n");
+        stopWatch.stop();
+        builder.append("> JNI execution time: ").append(stopWatch.getDuration()).append(" ms\n");
 
         return builder.toString();
     }
 
-    public static String javaStreamGenerateNumbers() {
+    public String javaStreamGenerateNumbers() {
         final int initValue = 1;
         final int countValues = 11;
-        final long beginTime = System.currentTimeMillis();
-        final var builder = new StringBuilder();
 
+        stopWatch.reset();
+        stopWatch.start();
+
+        final var builder = new StringBuilder();
         builder.append("\nStart Java stream generate numbers with init value ")
                .append(initValue).append(", count ").append(countValues).append("\n");
 
@@ -199,18 +209,20 @@ public final class CoroutineManager {
                                        .collect(Collectors.joining(","));
         builder.append("> Sequence: ").append("[").append(result).append("]").append("\n");
 
-        final long endTime = System.currentTimeMillis();
-        builder.append("> Java execution time: ").append(endTime - beginTime).append(" ms\n");
+        stopWatch.stop();
+        builder.append("> Java execution time: ").append(stopWatch.getDuration()).append(" ms\n");
 
         return builder.toString();
     }
 
-    public static String cppGeneratorYieldNumbers() {
+    public String cppGeneratorYieldNumbers() {
         final int initValue = 1;
         final int countValues = 10;
-        final long beginTime = System.currentTimeMillis();
-        final var builder = new StringBuilder();
 
+        stopWatch.reset();
+        stopWatch.start();
+
+        final var builder = new StringBuilder();
         builder.append("\nStart C++ generator yielding numbers with init value ")
                .append(initValue).append(", count ").append(countValues).append("\n");
         try {
@@ -228,19 +240,21 @@ public final class CoroutineManager {
             builder.append("> Generator exception: ").append(e.getMessage()).append("\n");
         }
 
-        final long endTime = System.currentTimeMillis();
-        builder.append("> JNI execution time: ").append(endTime - beginTime).append(" ms\n");
+        stopWatch.stop();
+        builder.append("> JNI execution time: ").append(stopWatch.getDuration()).append(" ms\n");
 
         return builder.toString();
     }
 
-    public static String javaStreamGenerateSequence() {
+    public String javaStreamGenerateSequence() {
         final int initValue = 1;
         final int startRange = 10;
         final int endRange = 20;
-        final long beginTime = System.currentTimeMillis();
-        final var builder = new StringBuilder();
 
+        stopWatch.reset();
+        stopWatch.start();
+
+        final var builder = new StringBuilder();
         builder.append("\nStart Java stream generate numbers with init value ")
                .append(initValue).append(", from ")
                .append(startRange).append(" to ").append(endRange).append("\n");
@@ -253,19 +267,21 @@ public final class CoroutineManager {
 
         builder.append("> Sequence: ").append("[").append(result).append("]").append("\n");
 
-        final long endTime = System.currentTimeMillis();
-        builder.append("> Java execution time: ").append(endTime - beginTime).append(" ms\n");
+        stopWatch.stop();
+        builder.append("> Java execution time: ").append(stopWatch.getDuration()).append(" ms\n");
 
         return builder.toString();
     }
 
-    public static String cppGeneratorYieldSequence() {
+    public String cppGeneratorYieldSequence() {
         final int initValue = 1;
         final int startRange = 10;
         final int endRange = 20;
-        final long beginTime = System.currentTimeMillis();
-        final var builder = new StringBuilder();
 
+        stopWatch.reset();
+        stopWatch.start();
+
+        final var builder = new StringBuilder();
         builder.append("\nStart C++ generator yielding numbers with init value ")
                .append(initValue).append(", from ")
                .append(startRange).append(" to ").append(endRange).append("\n");
@@ -284,8 +300,8 @@ public final class CoroutineManager {
             builder.append("> Generator exception: ").append(e.getMessage()).append("\n");
         }
 
-        final long endTime = System.currentTimeMillis();
-        builder.append("> JNI execution time: ").append(endTime - beginTime).append(" ms\n");
+        stopWatch.stop();
+        builder.append("> JNI execution time: ").append(stopWatch.getDuration()).append(" ms\n");
 
         return builder.toString();
     }

@@ -47,8 +47,8 @@ public final class FeatureRepository {
     private final FeatureDao featureDao;
 
     private static final PagingConfig CONFIG = new PagingConfig(
-        /*pageSize=*/ 5,
-        /*prefetchDistance=*/ 5,
+        /*pageSize=*/ 10,
+        /*prefetchDistance=*/ 10,
         /*enablePlaceholders=*/ true
     );
 

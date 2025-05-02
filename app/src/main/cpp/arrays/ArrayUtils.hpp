@@ -1,7 +1,7 @@
 /*
  * Licensed under the MIT License <http://opensource.org/licenses/MIT>.
  * SPDX-License-Identifier: MIT
- * Copyright (c) 2022 https://github.com/klappdev
+ * Copyright (c) 2022-2025 https://github.com/klappdev
  *
  * Permission is hereby  granted, free of charge, to any  person obtaining a copy
  * of this software and associated  documentation files (the "Software"), to deal
@@ -21,21 +21,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE  OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 #pragma once
 
-#include <concepts>
-#include <compare>
+#include <array>
 
-namespace kl::util::nullability {
+namespace firearrow::arrays {
 
-    template<typename T>
-    concept Pointer = std::is_pointer_v<T>;
+    template<typename T, std::size_t N, std::size_t... Ns>
+    static constexpr std::array<T, N> makeArrayImpl(std::initializer_list<T> list, std::index_sequence<Ns...>) {
+        return std::array<T, N>{ *(list.begin() + Ns)... };
+    }
 
-    template<typename T>
-    concept NullPointer = std::is_same_v<std::nullptr_t, T>;
-
-    template<typename T>
-    concept NonNullPointer = !std::is_same_v<std::nullptr_t, T>;
+    template<typename T, std::size_t N>
+    constexpr std::array<T, N> makeArray(std::initializer_list<T> list) {
+        //assert(N > list.size());
+        return makeArrayImpl<T, N>(list, std::make_index_sequence<N>());
+    }
 }
-
-

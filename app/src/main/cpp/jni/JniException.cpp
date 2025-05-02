@@ -1,7 +1,7 @@
 /*
  * Licensed under the MIT License <http://opensource.org/licenses/MIT>.
  * SPDX-License-Identifier: MIT
- * Copyright (c) 2022 https://github.com/klappdev
+ * Copyright (c) 2022-2025 https://github.com/klappdev
  *
  * Permission is hereby  granted, free of charge, to any  person obtaining a copy
  * of this software and associated  documentation files (the "Software"), to deal
@@ -62,8 +62,9 @@ void unregisterJniExceptions(JNIEnv* env) {
     env->DeleteGlobalRef(stacktraceElementClass);
 }
 
-namespace kl::jni {
-    using namespace kl::backtrace;
+namespace firearrow::jni {
+    using namespace backtrace;
+    using namespace strings;
 
     static void prepareStacktraceElement(JNIEnv* env, const Backtrace& backtrace, jobjectArray elements) {
         jsize index = 0;
@@ -81,7 +82,7 @@ namespace kl::jni {
     }
 
     void jvmThrowException(const std::string& message) {
-        UniqueJniEnv uniqueJniEnv;
+        jni::UniqueJniEnv uniqueJniEnv;
         JNIEnv* env = uniqueJniEnv.get();
 
         if (!env) return;

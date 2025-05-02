@@ -1,7 +1,7 @@
 /*
  * Licensed under the MIT License <http://opensource.org/licenses/MIT>.
  * SPDX-License-Identifier: MIT
- * Copyright (c) 2022 https://github.com/klappdev
+ * Copyright (c) 2022-2025 https://github.com/klappdev
  *
  * Permission is hereby  granted, free of charge, to any  person obtaining a copy
  * of this software and associated  documentation files (the "Software"), to deal
@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#include "Socket.hpp"
+#include "HttpClient.hpp"
 
 #include <arpa/inet.h>
 #include <netdb.h>
@@ -33,21 +33,25 @@
 static constexpr char REQUEST_TEMPLATE[] = "GET / HTTP/1.1\r\nHost: %s\r\n\r\n";
 static constexpr int BUFFER_SIZE = 8192;
 
-namespace kl::net {
-    using namespace kl::util::strings;
+namespace firearrow::net {
+    using namespace strings;
 
-    Socket::Socket(const std::string& address, std::uint16_t port)
+    HttpClient::HttpClient()
         : fd(-1)
-        , address(address)
-        , port(port) {
-        request = format(REQUEST_TEMPLATE, address.c_str());
+        , port(0) {
+
     }
 
-    Socket::~Socket() {
+    HttpClient::~HttpClient() {
         disconnect();
     }
 
-    Result<std::uint32_t, NetworkError> Socket::create() {
+    Result<std::uint32_t, NetworkError> HttpClient::create(const std::string& address, std::uint16_t port) {
+        this->address = address;
+        this->port = port;
+
+        request = format(REQUEST_TEMPLATE, address.c_str());
+
         fd = ::socket(AF_INET, SOCK_STREAM, 0);
 
         if (fd == -1) {
@@ -57,15 +61,25 @@ namespace kl::net {
         return static_cast<std::int32_t>(fd);
     }
 
-    Result<void, NetworkError> Socket::connect() {
+    Result<void, NetworkError> HttpClient::connect() {
         struct hostent* hostEntry = ::gethostbyname(address.c_str());
 
         if (hostEntry == nullptr) {
-            return NetworkError("Can't get host by name, error %s", ::hstrerror(h_errno));
+            return NetworkError("Can't get host by name, error", ::strerror(errno));
         }
 
-        in_addr_t networkAddress = ::inet_addr(::inet_ntoa(*(struct in_addr*)(hostEntry->h_addr_list)));
-        
+        if (hostEntry->h_addr_list == nullptr || hostEntry->h_addr_list[0] == nullptr) {
+            return NetworkError("Can't get address list, error %s", ::hstrerror(h_errno));
+        }
+
+        const char* inetAddress = ::inet_ntoa(*(struct in_addr*)(hostEntry->h_addr_list));
+
+        if (inetAddress == nullptr) {
+            return NetworkError("Can't get inne address, error %s", ::hstrerror(h_errno));
+        }
+
+        in_addr_t networkAddress = ::inet_addr(inetAddress);
+
         if (networkAddress == static_cast<in_addr_t>(-1)) {
             return NetworkError("Can't get network address, error \"%s\"", *(hostEntry->h_addr_list));
         }
@@ -81,16 +95,16 @@ namespace kl::net {
         return {};
     }
 
-    void Socket::disconnect() {
+    void HttpClient::disconnect() {
         if (isOpened()) {
             ::close(fd);
             fd = -1;
         }
     }
 
-    bool Socket::isOpened() const { return fd != -1; }
+    bool HttpClient::isOpened() const { return fd != -1; }
 
-    Result<std::int64_t, NetworkError> Socket::send() {
+    Result<std::int64_t, NetworkError> HttpClient::send() {
         std::int64_t totalBytes = 0;
         const std::size_t requestLength = request.length() + 1;
 
@@ -107,7 +121,7 @@ namespace kl::net {
         return totalBytes;
     }
 
-    Result<std::vector<std::string>, NetworkError> Socket::receive() const {
+    Result<std::vector<std::string>, NetworkError> HttpClient::receive() const {
         char buffer[BUFFER_SIZE] = {0};
         std::int64_t readBytes = 0;
         std::vector<std::string> data;

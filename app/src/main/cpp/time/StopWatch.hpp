@@ -1,7 +1,7 @@
 /*
  * Licensed under the MIT License <http://opensource.org/licenses/MIT>.
  * SPDX-License-Identifier: MIT
- * Copyright (c) 2022-2025 https://github.com/klappdev
+ * Copyright (c) 2025 https://github.com/klappdev
  *
  * Permission is hereby  granted, free of charge, to any  person obtaining a copy
  * of this software and associated  documentation files (the "Software"), to deal
@@ -21,34 +21,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE  OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+#pragma once
 
-#include "UniqueUtfChars.hpp"
+#include <chrono>
 
-#include <cstring>
+namespace firearrow::time {
 
-namespace firearrow::jni {
+    class StopWatch final {
+    public:
+        StopWatch();
+        ~StopWatch();
 
-    UniqueUtfChars::UniqueUtfChars(JNIEnv* env, jstring jvmString)
-        : env(env), jvmString(jvmString) {
+        void start();
+        void stop();
+        void reset();
 
-        if (jvmString != nullptr) {
-            rawChars = env->GetStringUTFChars(jvmString, nullptr);
-        } else {
-            rawChars = nullptr;
-        }
-    }
+        uint64_t getDuration() const;
 
-    UniqueUtfChars::~UniqueUtfChars() {
-        if (rawChars != nullptr) {
-            env->ReleaseStringUTFChars(jvmString, rawChars);
-        }
-    }
-
-    const Nullable<const char*>& UniqueUtfChars::get() const {
-        return rawChars;
-    }
-
-    std::size_t UniqueUtfChars::size() const {
-        return rawChars != nullptr ? std::strlen(rawChars) : 0;
-    }
+    private:
+        std::chrono::time_point<std::chrono::steady_clock> beginTime;
+        std::chrono::time_point<std::chrono::steady_clock> endTime;
+    };
 }
+

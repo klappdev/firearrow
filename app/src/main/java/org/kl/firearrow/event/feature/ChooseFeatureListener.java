@@ -1,7 +1,7 @@
 /*
  * Licensed under the MIT License <http://opensource.org/licenses/MIT>.
  * SPDX-License-Identifier: MIT
- * Copyright (c) 2022-2023 https://github.com/klappdev
+ * Copyright (c) 2022-2025 https://github.com/klappdev
  *
  * Permission is hereby  granted, free of charge, to any  person obtaining a copy
  * of this software and associated  documentation files (the "Software"), to deal
@@ -27,69 +27,101 @@ import static org.kl.firearrow.util.ContextUtils.*;
 
 import android.content.Context;
 import android.view.View;
-
 import androidx.annotation.NonNull;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 import org.kl.firearrow.coroutine.CoroutineManager;
 import org.kl.firearrow.fs.FileManager;
 import org.kl.firearrow.fs.OverwriteMode;
+import org.kl.firearrow.net.NetworkConnectivityHelper;
 import org.kl.firearrow.net.NetworkManager;
 import org.kl.firearrow.simd.SimdManager;
-import org.kl.firearrow.ui.feature.FeatureActivity;
+
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public final class ChooseFeatureListener implements View.OnClickListener {
     private final long featureId;
-    private final FeatureActivity activity;
+    private final CompositeDisposable disposables;
+    private final NetworkConnectivityHelper networkConnectivityHelper;
 
-    public ChooseFeatureListener(long featureId, @NonNull FeatureActivity activity) {
+    private final Consumer<String> showExecutionFeature;
+
+    private final FileManager fileManager;
+
+    private final CoroutineManager coroutineManager;
+    private final NetworkManager networkManager;
+
+    private final SimdManager simdManager;
+
+    public ChooseFeatureListener(long featureId, @NonNull CompositeDisposable disposables,
+                                 @NonNull NetworkConnectivityHelper networkConnectivityHelper,
+                                 @NonNull Consumer<String> showExecutionFeature) {
         this.featureId = featureId;
-        this.activity = activity;
+        this.disposables = disposables;
+        this.networkConnectivityHelper = networkConnectivityHelper;
+        this.showExecutionFeature = showExecutionFeature;
+
+        this.fileManager = new FileManager();
+        this.coroutineManager = new CoroutineManager();
+        this.networkManager = new NetworkManager();
+        this.simdManager = new SimdManager();
     }
 
     @Override
     public void onClick(View view) {
-        activity.getDisposables().add(Observable.fromCallable(this::executeFeature)
+        disposables.add(Observable.fromCallable(() -> executeFeature(view.getContext()))
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe((String result) -> {
-                activity.showExecutionFeature(result);
+                showExecutionFeature.accept(result);
                 toast(view.getContext(), "Finished operation !!!");
             }));
     }
 
-    private String executeFeature() {
-        final Context context = activity.getApplicationContext();
-
+    private String executeFeature(@NonNull Context context) {
         return switch ((int) featureId) {
-            case 1 -> FileManager.javaDeleteFile(context);
-            case 2 -> FileManager.cppEraseFile(context, OverwriteMode.SIMPLE_MODE);
-            case 3 -> FileManager.cppEraseFile(context, OverwriteMode.OPENBSD_MODE);
-            case 4 -> FileManager.cppEraseFile(context, OverwriteMode.DOD_MODE);
-            case 5 -> FileManager.javaDeleteDirectory(context);
-            case 6 -> FileManager.cppEraseDirectory(context);
-            case 7 -> FileManager.javaEraseDirectoryRecursive(context);
-            case 8 -> FileManager.cppEraseDirectoryRecursive(context);
-            case 9 -> CoroutineManager.javaThreadRunnableOperation();
-            case 10 -> CoroutineManager.cppCoroutineRunnableOperation();
-            case 11 -> CoroutineManager.javaThreadCallableOperation();
-            case 12 -> CoroutineManager.cppCoroutineCallableOperation();
-            case 13 -> CoroutineManager.javaStreamGenerateNumbers();
-            case 14 -> CoroutineManager.cppGeneratorYieldNumbers();
-            case 15 -> CoroutineManager.javaStreamGenerateSequence();
-            case 16 -> CoroutineManager.cppGeneratorYieldSequence();
-            case 17 -> SimdManager.javaAddTwoArrayNumbers();
-            case 18 -> SimdManager.cppAddTwoArrayNumbers();
-            case 19 -> SimdManager.javaStreamAddTwoArrayNumbers();
-            case 20 -> SimdManager.cppSimdAddTwoArrayNumbers();
-            case 21 -> NetworkManager.javaPerformGETRequest();
-            case 22 -> NetworkManager.cppPerformGETRequest();
-            case 23 -> NetworkManager.javaPerformAsyncGETRequest();
-            case 24 -> NetworkManager.cppPerformAsyncGETRequest();
+            case 1 -> fileManager.javaDeleteFile(context);
+            case 2 -> fileManager.cppEraseFile(context, OverwriteMode.SIMPLE_MODE);
+            case 3 -> fileManager.cppEraseFile(context, OverwriteMode.OPENBSD_MODE);
+            case 4 -> fileManager.cppEraseFile(context, OverwriteMode.DOD_MODE);
+            case 5 -> fileManager.javaDeleteDirectory(context);
+            case 6 -> fileManager.cppEraseDirectory(context);
+            case 7 -> fileManager.javaEraseDirectoryRecursive(context);
+            case 8 -> fileManager.cppEraseDirectoryRecursive(context);
+            case 9 -> coroutineManager.javaThreadRunnableOperation();
+            case 10 -> coroutineManager.cppCoroutineRunnableOperation();
+            case 11 -> coroutineManager.javaThreadCallableOperation();
+            case 12 -> coroutineManager.cppCoroutineCallableOperation();
+            case 13 -> coroutineManager.javaStreamGenerateNumbers();
+            case 14 -> coroutineManager.cppGeneratorYieldNumbers();
+            case 15 -> coroutineManager.javaStreamGenerateSequence();
+            case 16 -> coroutineManager.cppGeneratorYieldSequence();
+            case 17 -> simdManager.javaAdditionTwoIntegerArrays();
+            case 18 -> simdManager.cppSimdAdditionTwoIntegerArrays();
+            case 19 -> simdManager.cppFastSimdAdditionTwoIntegerArrays();
+            case 20 -> simdManager.javaSubtractTwoIntegerArrays();
+            case 21 -> simdManager.cppSimdSubtractTwoIntegerArrays();
+            case 22 -> simdManager.cppFastSimdSubtractTwoIntegerArrays();
+            case 23 -> simdManager.cppCheckSimdAbiIsSupported();
+            case 24 -> executeNetworkFeature(context, networkManager::javaPerformHttpRequest);
+            case 25 -> executeNetworkFeature(context, networkManager::cppPerformHttpRequest);
+            case 26 -> executeNetworkFeature(context, networkManager::javaPerformAsyncHttpRequest);
+            case 27 -> executeNetworkFeature(context, networkManager::cppPerformAsyncHttpRequest);
             default -> "Unknown operation!!!";
         };
+    }
+
+    private String executeNetworkFeature(@NonNull Context context, @NonNull Supplier<String> networkTask) {
+        if (networkConnectivityHelper.isNetworkAvailableSynchronously()) {
+            return networkTask.get();
+        } else {
+            toast(context, "Network is not available");
+            return "";
+        }
     }
 }

@@ -1,7 +1,7 @@
 /*
  * Licensed under the MIT License <http://opensource.org/licenses/MIT>.
  * SPDX-License-Identifier: MIT
- * Copyright (c) 2022-2023 https://github.com/klappdev
+ * Copyright (c) 2022-2025 https://github.com/klappdev
  *
  * Permission is hereby  granted, free of charge, to any  person obtaining a copy
  * of this software and associated  documentation files (the "Software"), to deal
@@ -21,19 +21,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE  OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.kl.firearrow.simd;
+#pragma once
 
-import lombok.Getter;
+#include <concepts>
+#include <compare>
 
-public enum SimdAbi {
-    SIMD_128_BITS(16),
-    SIMD_256_BITS(32),
-    SIMD_512_BITS(64);
+namespace firearrow::nullability {
 
-    @Getter
-    private final int countBytes;
+    template<typename T>
+    concept Pointer = std::is_pointer_v<T>;
 
-    private SimdAbi(int countBytes) {
-        this.countBytes = countBytes;
-    }
+    template<typename T>
+    concept NullPointer = std::is_same_v<std::nullptr_t, T>;
+
+    template<typename T>
+    concept NonNullPointer = !std::is_same_v<std::nullptr_t, T>;
 }
+
+

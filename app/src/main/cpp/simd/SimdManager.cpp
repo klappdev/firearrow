@@ -1,7 +1,7 @@
 /*
  * Licensed under the MIT License <http://opensource.org/licenses/MIT>.
  * SPDX-License-Identifier: MIT
- * Copyright (c) 2022 https://github.com/klappdev
+ * Copyright (c) 2022-2025 https://github.com/klappdev
  *
  * Permission is hereby  granted, free of charge, to any  person obtaining a copy
  * of this software and associated  documentation files (the "Software"), to deal
@@ -22,233 +22,160 @@
  * SOFTWARE.
  */
 
-#include <vector>
-#include <experimental/simd>
+#include <jni.h>
+#include <cpu-features.h>
 
-#include "SimdAbi.hpp"
-#include <jni/UniqueUtfChars.hpp>
-#include <util/nullability/NonNull.hpp>
-#include <util/nullability/Nullable.hpp>
+#include "SimdArithmetic.hpp"
+
+#include <nullability/NonNull.hpp>
+#include <nullability/Nullable.hpp>
+#include <time/StopWatch.hpp>
 
 namespace {
     jclass simdResultClass = nullptr;
     jclass simdAbiClass = nullptr;
-
-    jclass integerClass = nullptr;
-    jclass integerArrayClass = nullptr;
-    jclass illegalArgumentExceptionClass = nullptr;
+    jclass simdExceptionClass = nullptr;
 
     jmethodID simdResultConstructorId = nullptr;
-    jmethodID integerConstructorId = nullptr;
-
-    jmethodID getCountBytesMethodId = nullptr;
-    jmethodID intValueMethodId = nullptr;
 }
 
-using namespace kl::util::nullability;
+namespace firearrow::simd {
+    using namespace nullability;
+    using namespace time;
 
-namespace kl::simd {
+    std::vector<std::int32_t> convertFromJvmArray(const NonNull<JNIEnv*>& env, jintArray jvmArray, std::size_t lengthArray) {
+        jint* jvmRawArray = env->GetIntArrayElements(jvmArray, nullptr);
 
-    std::vector<std::int32_t> convertFromJvmArray(const NonNull<JNIEnv*>& env, jobjectArray jvmArray,
-                                                  std::size_t lengthArray) {
-        std::vector<std::int32_t> nativeArray = {};
+        std::vector<std::int32_t> nativeArray(jvmRawArray, std::next(jvmRawArray, lengthArray));
 
-        for (std::int32_t i = 0; i < lengthArray; ++i) {
-            jobject element = env->GetObjectArrayElement(jvmArray, i);
-
-            nativeArray[i] = env->CallIntMethod(element, intValueMethodId);
-        }
+        env->ReleaseIntArrayElements(jvmArray, jvmRawArray, JNI_ABORT);
 
         return nativeArray;
     }
 
-    jobjectArray convertToJvmArray(const NonNull<JNIEnv*>& env,
-                                   const std::vector<std::int32_t>& nativeArray) {
-        jobjectArray jvmArray = env->NewObjectArray(static_cast<jsize>(nativeArray.size()), integerClass, nullptr);
+    jintArray convertToJvmArray(const NonNull<JNIEnv*>& env, const std::vector<std::int32_t>& nativeArray) {
+        jintArray jvmArray = env->NewIntArray(nativeArray.size());
 
-        for (std::int32_t i = 0; i < nativeArray.size(); ++i) {
-            jobject element = env->NewObject(integerClass, integerConstructorId, nativeArray[i]);
-            env->SetObjectArrayElement(jvmArray, i, element);
-        }
+        env->SetIntArrayRegion(jvmArray, 0, nativeArray.size(), nativeArray.data());
 
         return jvmArray;
     }
 
-    std::vector<std::int32_t> sumScalarArray(const std::vector<std::int32_t>& leftArray,
-                                             const std::vector<std::int32_t>& rightArray) {
-        std::vector<std::int32_t> resultArray;
-        resultArray.reserve(leftArray.size());
+    jboolean nativeIsSimdAbiSupported() {
+        return android_getCpuFeatures() & ANDROID_CPU_ARM_FEATURE_NEON != 0;
+    }
 
-        for (std::size_t i = 0; i < leftArray.size(); ++i) {
-            resultArray[i] = leftArray[i] + rightArray[i];
+    template<SimdArithmeticType SAT>
+    std::vector<std::int32_t> simdNeonOperationArrays(int32_t leftArray[], int32_t rightArray[], size_t arraySize) {
+        std::vector<std::int32_t> targetArray(arraySize, 0);
+
+        if (SAT == SimdArithmeticType::SIMD_ADDITION) {
+            addNeonArray(leftArray, rightArray, &targetArray[0], targetArray.size());
+        } else if (SAT == SimdArithmeticType::SIMD_SUBTRACT) {
+            subNeonArray(leftArray, rightArray, &targetArray[0], targetArray.size());
         }
 
-        return resultArray;
+        return targetArray;
     }
 
-    template<std::size_t N>
-    std::vector<std::int32_t> sumSimdArray(const std::vector<std::int32_t>& leftArray,
-                                           const std::vector<std::int32_t>& rightArray) {
-        std::vector<std::int32_t> resultArray = {};
-#if __cpp_lib_experimental_parallel_simd
-        constexpr std::size_t simdSize = (N / sizeof(std::int32_t));
+    template<SimdArithmeticType SAT>
+    jobject simdOperationArrays(JNIEnv* env, jclass clazz, jintArray jvmLeftArray, jintArray jvmRightArray) {
+        const std::size_t jvmLeftArraySize = env->GetArrayLength(jvmLeftArray);
+        const std::size_t jvmRightArraySize = env->GetArrayLength(jvmRightArray);
 
-        std::experimental::fixed_size_simd<std::int32_t, simdSize> leftVector;
-        std::experimental::fixed_size_simd<std::int32_t, simdSize> rightVector;
-
-        for (std::size_t i = 0; i < leftArray.size() / simdSize; ++i) {
-            leftVector.copy_from(&leftArray[i * simdSize], std::experimental::element_aligned);
-            rightVector.copy_from(&rightArray[i * simdSize], std::experimental::element_aligned);
-
-            auto resultVector = leftVector + rightVector;
-            resultVector.copy_to(&resultArray[i * simdSize], std::experimental::element_aligned);
-        }
-#else
-        resultArray = sumScalarArray(leftArray, rightArray);
-#endif
-
-        return resultArray;
-    }
-
-    jboolean nativeIsSupported(JNIEnv* rawEnv, jclass clazz, jobject jvmSimdAbi) {
-        /*FIXME: implement in future*/
-        return JNI_FALSE;
-    }
-
-    jobject nativeSumScalarArrays(JNIEnv* rawEnv, jclass clazz,
-                                  jobjectArray jvmLeftArray, jobjectArray jvmRightArray) {
-        auto env = makeNonNull(rawEnv);
-        std::vector<std::int32_t> nativeArray;
-
-        if (!env->IsInstanceOf(jvmLeftArray, integerArrayClass)) {
-            env->ThrowNew(illegalArgumentExceptionClass, "Native simd support integer array");
+        if (jvmLeftArraySize != jvmRightArraySize) {
+            env->ThrowNew(simdExceptionClass, "Jvm scalar arrays must be same size");
             return nullptr;
         }
 
-        std::size_t leftArraySize = env->GetArrayLength(jvmLeftArray);
-        std::size_t rightArraySize = env->GetArrayLength(jvmRightArray);
+        auto leftArray = convertFromJvmArray(env, jvmLeftArray, jvmLeftArraySize);
+        auto rightArray = convertFromJvmArray(env, jvmRightArray, jvmLeftArraySize);
 
-        if (leftArraySize != rightArraySize) {
-            env->ThrowNew(illegalArgumentExceptionClass, "Native scalar arrays must be same size");
+        StopWatch stopWatch;
+        stopWatch.start();
+
+        const std::vector<std::int32_t> nativeArray = simdNeonOperationArrays<SAT>(leftArray.data(), rightArray.data(), jvmLeftArraySize);
+
+        stopWatch.stop();
+
+        return env->NewObject(simdResultClass, simdResultConstructorId, convertToJvmArray(env, nativeArray),
+                              nativeIsSimdAbiSupported(), static_cast<jlong>(stopWatch.getDuration()));
+    }
+
+    template<SimdArithmeticType SAT>
+    jintArray simdFastOperationArrays(JNIEnv* env, jclass clazz, jintArray jvmLeftArray, jintArray jvmRightArray) {
+        const std::size_t jvmLeftArraySize = env->GetArrayLength(jvmLeftArray);
+        const std::size_t jvmRightArraySize = env->GetArrayLength(jvmRightArray);
+
+        if (jvmLeftArraySize != jvmRightArraySize) {
+            env->ThrowNew(simdExceptionClass, "Jvm scalar arrays must be same size");
             return nullptr;
         }
 
-        auto leftArray = convertFromJvmArray(env, jvmLeftArray, leftArraySize);
-        auto rightArray = convertFromJvmArray(env, jvmRightArray, leftArraySize);
+        jboolean isCopy;
+        auto* leftArray = static_cast<jint*>(env->GetPrimitiveArrayCritical(jvmLeftArray, &isCopy));
+        auto* rightArray = static_cast<jint*>(env->GetPrimitiveArrayCritical(jvmRightArray, &isCopy));
 
-        auto beginTime = std::chrono::steady_clock::now();
+        const std::vector<std::int32_t> nativeArray = simdNeonOperationArrays<SAT>(leftArray, rightArray, jvmLeftArraySize);
 
-        nativeArray = sumScalarArray(leftArray, rightArray);
+        env->ReleasePrimitiveArrayCritical(jvmLeftArray, leftArray, JNI_ABORT);
+        env->ReleasePrimitiveArrayCritical(jvmRightArray, rightArray, JNI_ABORT);
 
-        auto endTime = std::chrono::steady_clock::now();
-
-        return env->NewObject(simdResultClass, simdResultConstructorId,
-                convertToJvmArray(env, nativeArray), JNI_FALSE,
-                std::chrono::duration_cast<std::chrono::milliseconds>(endTime - beginTime).count());
+        return convertToJvmArray(env, nativeArray);
     }
 
-    jobject nativeSumSimdArrays(JNIEnv* rawEnv, jclass clazz, jobjectArray jvmLeftArray,
-                            jobjectArray jvmRightArray, jobject jvmSimdAbi) {
-        auto env = makeNonNull(rawEnv);
-        std::vector<std::int32_t> nativeArray;
-
-        if (!env->IsInstanceOf(jvmLeftArray, integerArrayClass)) {
-            env->ThrowNew(illegalArgumentExceptionClass, "Native simd support integer array");
-            return nullptr;
-        }
-
-        jint jvmCountBytes = env->CallIntMethod(jvmSimdAbi, getCountBytesMethodId);
-        std::size_t leftArraySize = env->GetArrayLength(jvmLeftArray);
-        std::size_t rightArraySize = env->GetArrayLength(jvmRightArray);
-
-        if (leftArraySize != jvmCountBytes || rightArraySize != jvmCountBytes) {
-            env->ThrowNew(illegalArgumentExceptionClass, "Native scalar arrays must be same size");
-            return nullptr;
-        }
-
-        auto leftArray = convertFromJvmArray(env, jvmLeftArray, leftArraySize);
-        auto rightArray = convertFromJvmArray(env, jvmRightArray, leftArraySize);
-
-        auto beginTime = std::chrono::steady_clock::now();
-
-        switch (jvmCountBytes) {
-        case SIMD_ABI.ordinal(SimdAbi::SIMD_128_BITS): {
-            nativeArray = sumSimdArray<SIMD_ABI.ordinal(SimdAbi::SIMD_128_BITS)>(leftArray, rightArray);
-            break;
-        }
-        case SIMD_ABI.ordinal(SimdAbi::SIMD_256_BITS): {
-            nativeArray = sumSimdArray<SIMD_ABI.ordinal(SimdAbi::SIMD_256_BITS)>(leftArray, rightArray);
-            break;
-        }
-        case SIMD_ABI.ordinal(SimdAbi::SIMD_512_BITS): {
-            nativeArray = sumSimdArray<SIMD_ABI.ordinal(SimdAbi::SIMD_512_BITS)>(leftArray, rightArray);
-            break;
-        }
-        default: break;
-        }
-
-        auto endTime = std::chrono::steady_clock::now();
-
-        return env->NewObject(simdResultClass, simdResultConstructorId,
-                convertToJvmArray(env, nativeArray), nativeIsSupported(rawEnv, clazz, jvmSimdAbi),
-                std::chrono::duration_cast<std::chrono::milliseconds>(endTime - beginTime).count());
+    jobject nativeAddSimdArrays(JNIEnv* rawEnv, jclass clazz, jintArray jvmLeftArray, jintArray jvmRightArray) {
+        return simdOperationArrays<SimdArithmeticType::SIMD_ADDITION>(rawEnv, clazz, jvmLeftArray, jvmRightArray);
     }
 
-    jobject nativeSumSimdMaskArrays(JNIEnv* rawEnv, jclass clazz, jobjectArray jvmLeftArray,
-                                    jobjectArray jvmRightArray, jobject jvmMask, jobject jvmSimdAbi) {
-        /*FIXME: implement in future*/
-        return nullptr;
+    jintArray nativeFastAddSimdArrays(JNIEnv* rawEnv, jclass clazz, jintArray jvmLeftArray, jintArray jvmRightArray) {
+        return simdFastOperationArrays<SimdArithmeticType::SIMD_ADDITION>(rawEnv, clazz, jvmLeftArray, jvmRightArray);
     }
 
-    constexpr std::array<JNINativeMethod, 4> JNI_METHODS = {{
-        {"isSupported", "(Lorg/kl/firearrow/simd/SimdAbi;)Z", (void*)nativeIsSupported},
-        {"sumArrays",
-         "([Ljava/lang/Number;[Ljava/lang/Number;)Lorg/kl/firearrow/simd/SimdResult;",
-         (void*)nativeSumScalarArrays},
-        {"sumArrays",
-         "([Ljava/lang/Number;[Ljava/lang/Number;Lorg/kl/firearrow/simd/SimdAbi;)Lorg/kl/firearrow/simd/SimdResult;",
-         (void*)nativeSumSimdArrays},
-        {"sumArrays",
-         "([Ljava/lang/Number;[Ljava/lang/Number;Ljava/util/BitSet;Lorg/kl/firearrow/simd/SimdAbi;)Lorg/kl/firearrow/simd/SimdResult;",
-         (void*)nativeSumSimdMaskArrays},
+    jobject nativeSubSimdArrays(JNIEnv* rawEnv, jclass clazz, jintArray jvmLeftArray, jintArray jvmRightArray) {
+        return simdOperationArrays<SimdArithmeticType::SIMD_SUBTRACT>(rawEnv, clazz, jvmLeftArray, jvmRightArray);
+    }
+
+    jintArray nativeFastSubSimdArrays(JNIEnv* rawEnv, jclass clazz, jintArray jvmLeftArray, jintArray jvmRightArray) {
+        return simdFastOperationArrays<SimdArithmeticType::SIMD_SUBTRACT>(rawEnv, clazz, jvmLeftArray, jvmRightArray);
+    }
+
+    constexpr std::array<JNINativeMethod, 5> JNI_METHODS = {{
+        {"nativeIsSimdSupported", "()Z", (void*)nativeIsSimdAbiSupported},
+        {"nativeSimdAddArrays",
+         "([I[I)Lorg/kl/firearrow/simd/SimdResult;",
+         (void*)nativeAddSimdArrays},
+        {"nativeFastSimdAddArrays",
+         "([I[I)[I",
+         (void*)nativeFastAddSimdArrays},
+        {"nativeSimdSubArrays",
+         "([I[I)Lorg/kl/firearrow/simd/SimdResult;",
+         (void*)nativeSubSimdArrays},
+        {"nativeFastSimdSubArrays",
+         "([I[I)[I",
+         (void*)nativeFastSubSimdArrays},
     }};
 }
 
-jint registerSimdManager(JNIEnv* rawEnv) {
-    using kl::simd::JNI_METHODS;
-    auto env = makeNonNull(rawEnv);
+jint registerSimdManager(JNIEnv* env) {
+    using firearrow::simd::JNI_METHODS;
 
-    jclass temporaryClass = env->FindClass("java/lang/Integer");
-    integerClass = (jclass) env->NewGlobalRef(temporaryClass);
-
-    temporaryClass = env->FindClass("[Ljava/lang/Integer;");
-    integerArrayClass = (jclass) env->NewGlobalRef(temporaryClass);
-
-    temporaryClass = env->FindClass("java/lang/IllegalArgumentException");
-    illegalArgumentExceptionClass = (jclass) env->NewGlobalRef(temporaryClass);
+    jclass temporaryClass = env->FindClass("org/kl/firearrow/simd/SimdException");
+    simdExceptionClass = (jclass) env->NewGlobalRef(temporaryClass);
 
     temporaryClass = env->FindClass("org/kl/firearrow/simd/SimdResult");
     simdResultClass = (jclass) env->NewGlobalRef(temporaryClass);
 
-    temporaryClass = env->FindClass("org/kl/firearrow/simd/SimdAbi");
-    simdAbiClass = (jclass) env->NewGlobalRef(temporaryClass);
-
-    simdResultConstructorId = env->GetMethodID(simdResultClass, "<init>", "([Ljava/lang/Number;ZJ)V");
-    integerConstructorId = env->GetMethodID(integerClass, "<init>", "(I)V");
-
-    getCountBytesMethodId = env->GetMethodID(simdAbiClass, "getCountBytes", "()I");
-    intValueMethodId = env->GetMethodID(integerClass, "intValue", "()I");
+    simdResultConstructorId = env->GetMethodID(simdResultClass, "<init>", "([IZJ)V");
 
     jclass simdManagerClass = env->FindClass("org/kl/firearrow/simd/SimdManager");
+
+    env->DeleteLocalRef(temporaryClass);
+
     return env->RegisterNatives(simdManagerClass, JNI_METHODS.data(), JNI_METHODS.size());
 }
 
-void unregisterSimdManager(JNIEnv* rawEnv) {
-    auto env = makeNonNull(rawEnv);
-
+void unregisterSimdManager(JNIEnv* env) {
     env->DeleteGlobalRef(simdResultClass);
     env->DeleteGlobalRef(simdAbiClass);
-    env->DeleteGlobalRef(integerClass);
-    env->DeleteGlobalRef(integerArrayClass);
 }
-

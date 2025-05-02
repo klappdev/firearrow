@@ -1,7 +1,7 @@
 /*
  * Licensed under the MIT License <http://opensource.org/licenses/MIT>.
  * SPDX-License-Identifier: MIT
- * Copyright (c) 2022 https://github.com/klappdev
+ * Copyright (c) 2022-2025 https://github.com/klappdev
  *
  * Permission is hereby  granted, free of charge, to any  person obtaining a copy
  * of this software and associated  documentation files (the "Software"), to deal
@@ -26,11 +26,11 @@
 #include <string>
 #include <memory>
 
-#include <util/error/Result.hpp>
+#include <error/Result.hpp>
 #include "FileError.hpp"
 
-namespace kl::fs {
-    using namespace kl::util::error;
+namespace firearrow::fs {
+    using namespace error;
 
     struct FileDeleter final {
         void operator()(FILE *fd);

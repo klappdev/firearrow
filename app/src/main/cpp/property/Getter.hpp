@@ -1,7 +1,7 @@
 /*
  * Licensed under the MIT License <http://opensource.org/licenses/MIT>.
  * SPDX-License-Identifier: MIT
- * Copyright (c) 2022 https://github.com/klappdev
+ * Copyright (c) 2022-2025 https://github.com/klappdev
  *
  * Permission is hereby  granted, free of charge, to any  person obtaining a copy
  * of this software and associated  documentation files (the "Software"), to deal
@@ -25,27 +25,22 @@
 
 #include <functional>
 
-namespace kl::util::property {
+namespace firearrow::property {
 
     template<typename T>
-    class Property {
+    class Getter {
     public:
-        constexpr explicit Property(const T& value) : value(value) {}
-        ~Property() = default;
+        constexpr explicit Getter(const T& value) : value(value) {}
+        ~Getter() = default;
 
-        constexpr Property(const Property&) = default;
-        constexpr Property(Property&&) noexcept = default;
+        constexpr Getter(const Getter&) = default;
+        constexpr Getter(Getter&&) noexcept = default;
 
-        constexpr Property& operator=(const Property&) = default;
-        constexpr Property& operator=(Property&&) noexcept = default;
-
-        constexpr Property& operator=(const T& newValue) {
-            this->value = newValue;
-            return *this;
-        }
+        constexpr Getter& operator=(const Getter&) = default;
+        constexpr Getter& operator=(Getter&&) noexcept = default;
 
         constexpr operator const T&() const { return get(); }
-        constexpr const T& get() { return value; }
+        constexpr const T& get() const { return value; }
 
         constexpr bool operator==(const T& other) const { return value == other; }
         constexpr auto operator<=>(const T& other) const { return value <=> other; }
@@ -55,14 +50,9 @@ namespace kl::util::property {
     };
 
     template<typename T>
-    class Property<T&> {
+    class Getter<T&> {
     public:
-        constexpr explicit Property(T& value) : value(std::ref(value)) {}
-
-        constexpr Property& operator=(T& newValue) {
-            value.get() = newValue;
-            return *this;
-        }
+        constexpr explicit Getter(T& value) : value(std::ref(value)) {}
 
         constexpr operator T&() const { return get(); }
         constexpr T& get() const { return value.get(); }
@@ -75,14 +65,9 @@ namespace kl::util::property {
     };
 
     template<typename T>
-    class Property<T*> {
+    class Getter<T*> {
     public:
-        constexpr explicit Property(T* value) : value(std::ref(*value)) {}
-
-        constexpr Property& operator=(T* newValue) {
-            value.get() = *newValue;
-            return *this;
-        }
+        constexpr explicit Getter(T* value) : value(std::ref(*value)) {}
 
         constexpr operator T*() const { return get(); }
         constexpr T* get() const { return value.get(); }
